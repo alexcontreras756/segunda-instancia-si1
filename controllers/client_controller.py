@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from models.client import Client
 from utils.decorators import login_required, permission_required
 
+
 client_bp = Blueprint('clients', __name__, url_prefix='/clients')
 
 
@@ -24,9 +25,10 @@ def create_client():
         nombre = request.form.get('nombre')
         correo_electronico = request.form.get('email')
         telefono = request.form.get('telefono')
+        tipo_cliente = request.form.get('tipo_cliente')
 
-        if not all([ci, nombre]):
-            flash('Documento y nombre son requeridos', 'danger')
+        if not all([ci, nombre, tipo_cliente]):
+            flash('Documento, nombre y tipo de cliente son requeridos', 'danger')
             return render_template('clients/create.html')
 
         existing = Client.find_by_document(ci)
@@ -35,13 +37,26 @@ def create_client():
             flash('Ya existe un cliente con ese documento', 'danger')
             return render_template('clients/create.html')
 
-        client = Client.create(ci, nombre, correo_electronico, telefono)
+        try:
+            client = Client.create(
+                ci,
+                nombre,
+                correo_electronico,
+                telefono,
+                tipo_cliente
+            )
 
-        if client:
-            flash(f'Cliente {client["nombre"]} creado exitosamente', 'success')
-            return redirect(url_for('clients.list_clients'))
-        else:
-            flash('Error al crear el cliente', 'danger')
+            if client:
+                flash(f'Cliente {client["nombre"]} creado exitosamente', 'success')
+                return redirect(url_for('clients.list_clients'))
+            else:
+                flash('Error al crear el cliente', 'danger')
+
+        except ValueError as e:
+            flash(str(e), 'danger')
+
+        except Exception as e:
+            flash(f'Error al crear el cliente: {str(e)}', 'danger')
 
     return render_template('clients/create.html')
 
@@ -61,23 +76,32 @@ def edit_client(client_id):
         nombre = request.form.get('nombre')
         correo_electronico = request.form.get('email')
         telefono = request.form.get('telefono')
+        tipo_cliente = request.form.get('tipo_cliente')
 
-        if not nombre:
-            flash('El nombre del cliente es obligatorio', 'danger')
+        if not all([nombre, tipo_cliente]):
+            flash('El nombre del cliente y el tipo de cliente son obligatorios', 'danger')
             return render_template('clients/edit.html', client=client)
 
-        updated_client = Client.update(
-            client_id,
-            nombre=nombre,
-            correo_electronico=correo_electronico,
-            telefono=telefono
-        )
+        try:
+            updated_client = Client.update(
+                client_id,
+                nombre=nombre,
+                correo_electronico=correo_electronico,
+                telefono=telefono,
+                tipo_cliente=tipo_cliente
+            )
 
-        if updated_client:
-            flash(f'Cliente {updated_client["nombre"]} actualizado exitosamente', 'success')
-            return redirect(url_for('clients.list_clients'))
-        else:
-            flash('Error al actualizar el cliente', 'danger')
+            if updated_client:
+                flash(f'Cliente {updated_client["nombre"]} actualizado exitosamente', 'success')
+                return redirect(url_for('clients.list_clients'))
+            else:
+                flash('Error al actualizar el cliente', 'danger')
+
+        except ValueError as e:
+            flash(str(e), 'danger')
+
+        except Exception as e:
+            flash(f'Error al actualizar el cliente: {str(e)}', 'danger')
 
     return render_template('clients/edit.html', client=client)
 
@@ -113,5 +137,6 @@ def search_clients():
         'document_id': c['ci'],
         'full_name': c['nombre'],
         'email': c['correo_electronico'],
-        'phone': c['telefono']
+        'phone': c['telefono'],
+        'tipo_cliente': c['tipo_cliente']
     } for c in clients])

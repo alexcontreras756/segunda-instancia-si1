@@ -4,167 +4,382 @@
 
 {% block content %}
 
-<div class="row">
-    <div class="col-12">
-        <div class="page-header">
-            <h1><i class="fas fa-store"></i> Bienvenido, {{ session.full_name }}</h1>
-            <p>Panel principal del sistema de gestión MiniMarket QuickStore</p>
-            <p><strong>Rol:</strong> {{ session.rol }}</p>
+<style>
+/* ─── PAGE HEADER ─── */
+.dash-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.dash-header-left h1 {
+    font-family: var(--font-head);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--c-text);
+    letter-spacing: -.03em;
+    line-height: 1.1;
+    margin: 0;
+}
+.dash-header-left h1 span { color: var(--c-accent); }
+.dash-header-left p {
+    margin: .35rem 0 0;
+    color: var(--c-muted);
+    font-size: .875rem;
+}
+.dash-header-left .role-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(245,166,35,.12);
+    border: 1px solid rgba(245,166,35,.3);
+    color: var(--c-accent);
+    font-size: .72rem;
+    font-weight: 600;
+    font-family: var(--font-head);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    margin-top: .5rem;
+}
+.dash-header-right {
+    display: flex; align-items: center; gap: .5rem;
+}
+.dash-date {
+    font-size: .8rem; color: var(--c-muted);
+    display: flex; align-items: center; gap: .4rem;
+}
+
+/* ─── SECTION LABEL ─── */
+.section-label {
+    font-family: var(--font-head);
+    font-size: .65rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; gap: .6rem;
+}
+.section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--c-border);
+}
+
+/* ─── STAT CARDS ─── */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    padding: 1.35rem 1.35rem 1.1rem;
+    display: flex; flex-direction: column;
+    gap: .5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, border-color .2s, box-shadow .2s;
+    cursor: pointer;
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, var(--c-accent));
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--card-accent, var(--c-accent));
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+    text-decoration: none;
+}
+
+/* glow blob */
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; right: -20px;
+    width: 100px; height: 100px;
+    background: var(--card-accent, var(--c-accent));
+    opacity: .06;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.card-icon-row {
+    display: flex; align-items: center; justify-content: space-between;
+}
+.card-icon {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,.05);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem;
+    color: var(--card-accent, var(--c-accent));
+}
+.card-arrow {
+    font-size: .7rem;
+    color: var(--c-muted);
+    transition: color .2s, transform .2s;
+}
+.stat-card:hover .card-arrow {
+    color: var(--card-accent, var(--c-accent));
+    transform: translate(2px, -2px);
+}
+
+.card-label {
+    font-size: .78rem;
+    color: var(--c-muted);
+    font-weight: 400;
+    line-height: 1;
+}
+.card-value {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--c-text);
+    line-height: 1;
+    letter-spacing: -.04em;
+}
+.card-sub {
+    font-size: .75rem;
+    color: var(--c-muted);
+    display: flex; align-items: center; gap: .3rem;
+}
+.card-sub .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--c-green);
+    flex-shrink: 0;
+}
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+    background: var(--c-card);
+    border: 1px dashed var(--c-border);
+    border-radius: var(--radius);
+    padding: 3.5rem 2rem;
+    text-align: center;
+    margin-top: .5rem;
+}
+.empty-state-icon {
+    width: 64px; height: 64px;
+    background: rgba(255,255,255,.04);
+    border-radius: 16px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    color: var(--c-muted);
+    margin-bottom: 1rem;
+}
+.empty-state h4 {
+    font-family: var(--font-head);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--c-text);
+    margin-bottom: .4rem;
+}
+.empty-state p {
+    color: var(--c-muted);
+    font-size: .875rem;
+    max-width: 340px;
+    margin: 0 auto;
+}
+</style>
+
+<!-- ═══ PAGE HEADER ═══ -->
+<div class="dash-header">
+    <div class="dash-header-left">
+        <h1>Hola, <span>{{ session.full_name.split()[0] }}</span> </h1>
+        <p>Panel principal · MiniMarket QuickStore</p>
+        <div class="role-badge">
+            <i class="fas fa-shield-alt"></i> {{ session.rol }}
+        </div>
+    </div>
+    <div class="dash-header-right">
+        <div class="dash-date">
+            <i class="far fa-calendar-alt"></i>
+            <span id="dashDate"></span>
         </div>
     </div>
 </div>
 
-<div class="row mt-4">
+{% set has_any =
+    permissions_dashboard.can_view_users or
+    permissions_dashboard.can_view_clients or
+    permissions_dashboard.can_view_attendance or
+    permissions_dashboard.can_view_permissions or
+    permissions_dashboard.can_view_products or
+    permissions_dashboard.can_view_providers or
+    permissions_dashboard.can_view_sales or
+    permissions_dashboard.can_view_cash or
+    permissions_dashboard.can_view_warehouses
+%}
+
+{% if has_any %}
+
+<!-- ─── EQUIPO Y CLIENTES ─── -->
+{% if permissions_dashboard.can_view_users
+   or permissions_dashboard.can_view_clients
+   or permissions_dashboard.can_view_attendance
+   or permissions_dashboard.can_view_permissions %}
+
+<div class="section-label">Equipo &amp; Acceso</div>
+<div class="stat-grid">
 
     {% if permissions_dashboard.can_view_users %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-primary dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-users"></i> Usuarios Activos</h5>
-                <h2>{{ stats.users }}</h2>
-                <a href="{{ url_for('users.list_users') }}" class="text-white">
-                    Ver detalles →
-                </a>
-            </div>
+    <a class="stat-card" style="--card-accent:#58a6ff" href="{{ url_for('users.list_users') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-users"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
-    </div>
+        <div class="card-label">Usuarios activos</div>
+        <div class="card-value">{{ stats.users }}</div>
+    </a>
     {% endif %}
 
     {% if permissions_dashboard.can_view_clients %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-success dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-user-friends"></i> Clientes</h5>
-                <h2>{{ stats.clients }}</h2>
-                <a href="{{ url_for('clients.list_clients') }}" class="text-white">
-                    Ver detalles →
-                </a>
-            </div>
+    <a class="stat-card" style="--card-accent:#3ecf8e" href="{{ url_for('clients.list_clients') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-user-friends"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
-    </div>
+        <div class="card-label">Clientes registrados</div>
+        <div class="card-value">{{ stats.clients }}</div>
+    </a>
     {% endif %}
 
     {% if permissions_dashboard.can_view_attendance %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-info dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-clock"></i> Bitácora</h5>
-                <h2>{{ stats.today_attendance }}</h2>
-                <a href="{{ url_for('attendance.attendance_dashboard') }}" class="text-white">
-                    Ver registro →
-                </a>
-            </div>
+    <a class="stat-card" style="--card-accent:#a78bfa" href="{{ url_for('attendance.attendance_dashboard') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-clock"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
-    </div>
+        <div class="card-label">Registros hoy</div>
+        <div class="card-value">{{ stats.today_attendance }}</div>
+        <div class="card-sub"><span class="dot"></span> Bitácora</div>
+    </a>
     {% endif %}
 
     {% if permissions_dashboard.can_view_permissions %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-warning dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-key"></i> Módulos / Permisos</h5>
-                <h2>{{ stats.permissions }}</h2>
-                <a href="{{ url_for('permissions.list_permissions') }}" class="text-white">
-                    Ver permisos →
-                </a>
-            </div>
+    <a class="stat-card" style="--card-accent:#f5a623" href="{{ url_for('permissions.list_permissions') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-key"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
-    </div>
+        <div class="card-label">Módulos / Permisos</div>
+        <div class="card-value">{{ stats.permissions }}</div>
+    </a>
     {% endif %}
 
+</div>
+{% endif %}
+
+<!-- ─── INVENTARIO ─── -->
+{% if permissions_dashboard.can_view_products
+   or permissions_dashboard.can_view_providers
+   or permissions_dashboard.can_view_warehouses %}
+
+<div class="section-label">Inventario &amp; Logística</div>
+<div class="stat-grid">
+
     {% if permissions_dashboard.can_view_products %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-secondary dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-box"></i> Productos</h5>
-                <h2>{{ stats.products }}</h2>
-                <a href="{{ url_for('products.list_products') }}" class="text-white">
-                    Ver detalles →
-                </a>
-            </div>
+    <a class="stat-card" style="--card-accent:#f97316" href="{{ url_for('products.list_products') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-box"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
-    </div>
+        <div class="card-label">Productos</div>
+        <div class="card-value">{{ stats.products }}</div>
+    </a>
     {% endif %}
 
     {% if permissions_dashboard.can_view_providers %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-dark dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-truck"></i> Proveedores</h5>
-                <h2>{{ stats.providers }}</h2>
-                <a href="{{ url_for('providers.list_providers') }}" class="text-white">
-                    Ver detalles →
-                </a>
-            </div>
+    <a class="stat-card" style="--card-accent:#94a3b8" href="{{ url_for('providers.list_providers') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-truck"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
-    </div>
-    {% endif %}
-
-    {% if permissions_dashboard.can_view_sales %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-danger dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-cash-register"></i> Ventas</h5>
-                <h2>{{ stats.sales }}</h2>
-                <a href="{{ url_for('sales.list_sales') }}" class="text-white">
-                    Ver ventas →
-                </a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    {% if permissions_dashboard.can_view_cash %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-success dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-money-bill-wave"></i> Caja</h5>
-                <h2>{{ stats.cash }}</h2>
-                <p class="mb-1">Abiertas: {{ stats.cash_open }}</p>
-                <a href="{{ url_for('cash.list_cash') }}" class="text-white">
-                    Ver caja →
-                </a>
-            </div>
-        </div>
-    </div>
+        <div class="card-label">Proveedores</div>
+        <div class="card-value">{{ stats.providers }}</div>
+    </a>
     {% endif %}
 
     {% if permissions_dashboard.can_view_warehouses %}
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-primary dashboard-card">
-            <div class="card-body">
-                <h5><i class="fas fa-warehouse"></i> Almacén</h5>
-                <h2>{{ stats.warehouses }}</h2>
-                <a href="{{ url_for('warehouses.list_warehouses') }}" class="text-white">
-                    Ver almacenes →
-                </a>
-            </div>
+    <a class="stat-card" style="--card-accent:#38bdf8" href="{{ url_for('warehouses.list_warehouses') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-warehouse"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
-    </div>
+        <div class="card-label">Almacenes</div>
+        <div class="card-value">{{ stats.warehouses }}</div>
+    </a>
     {% endif %}
 
 </div>
+{% endif %}
 
-{% if not permissions_dashboard.can_view_users
-   and not permissions_dashboard.can_view_clients
-   and not permissions_dashboard.can_view_attendance
-   and not permissions_dashboard.can_view_permissions
-   and not permissions_dashboard.can_view_products
-   and not permissions_dashboard.can_view_providers
-   and not permissions_dashboard.can_view_sales
-   and not permissions_dashboard.can_view_cash
-   and not permissions_dashboard.can_view_warehouses %}
+<!-- ─── FINANZAS ─── -->
+{% if permissions_dashboard.can_view_sales or permissions_dashboard.can_view_cash %}
 
-<div class="card system-card mt-4">
-    <div class="card-body text-center">
-        <h4><i class="fas fa-lock"></i> Sin módulos asignados</h4>
-        <p class="text-muted">
-            Actualmente no tienes permisos asignados para ver módulos en el dashboard.
-            Comunícate con el administrador del sistema.
-        </p>
-    </div>
+<div class="section-label">Finanzas &amp; Ventas</div>
+<div class="stat-grid">
+
+    {% if permissions_dashboard.can_view_sales %}
+    <a class="stat-card" style="--card-accent:#e8374a" href="{{ url_for('sales.list_sales') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-cash-register"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Ventas totales</div>
+        <div class="card-value">{{ stats.sales }}</div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.can_view_cash %}
+    <a class="stat-card" style="--card-accent:#3ecf8e" href="{{ url_for('cash.list_cash') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-money-bill-wave"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Cajas registradas</div>
+        <div class="card-value">{{ stats.cash }}</div>
+        <div class="card-sub"><span class="dot"></span> {{ stats.cash_open }} abiertas ahora</div>
+    </a>
+    {% endif %}
+
+</div>
+{% endif %}
+
+{% else %}
+
+<!-- ─── EMPTY STATE ─── -->
+<div class="empty-state">
+    <div class="empty-state-icon"><i class="fas fa-lock"></i></div>
+    <h4>Sin módulos asignados</h4>
+    <p>No tienes permisos asignados para ver módulos en el dashboard. Comunícate con el administrador del sistema.</p>
 </div>
 
 {% endif %}
+
+<script>
+(function(){
+    const d = new Date();
+    const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+    const str = d.toLocaleDateString('es-ES', opts);
+    document.getElementById('dashDate').textContent =
+        str.charAt(0).toUpperCase() + str.slice(1);
+})();
+</script>
 
 {% endblock %}

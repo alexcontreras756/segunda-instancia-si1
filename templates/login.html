@@ -4,75 +4,290 @@
 
 {% block content %}
 
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-4">
+<style>
+/* ─── LOGIN LAYOUT ─── */
+.login-wrap {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: var(--c-bg);
+    z-index: 500;
+    overflow: hidden;
+}
 
-        <div class="card shadow login-card">
+/* animated background grid */
+.login-wrap::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(245,166,35,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(245,166,35,.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+    pointer-events: none;
+}
 
-            <div class="card-header bg-primary text-white text-center">
-                <h4><i class="fas fa-store"></i> MiniMarket "QuickStore"</h4>
-                <h5>Iniciar Sesión</h5>
-            </div>
+/* glow blobs */
+.login-wrap::after {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(245,166,35,.08) 0%, transparent 70%);
+    top: -150px; left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
 
-            <div class="card-body">
+/* ─── CARD ─── */
+.login-card {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.5);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    animation: cardIn .45s cubic-bezier(.22,1,.36,1) both;
+}
 
-                <form method="POST">
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(28px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0)   scale(1);   }
+}
 
-                    <div class="mb-3">
-                        <label for="username" class="form-label">
-                            <i class="fas fa-user"></i> Código de Usuario
-                        </label>
+/* top accent bar */
+.login-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--c-accent), var(--c-accent2));
+}
 
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="username"
-                            name="username"
-                            required
-                            autofocus
-                            placeholder="Ej: ADM-001"
-                        >
-                    </div>
+/* ─── CARD HEADER ─── */
+.login-header {
+    padding: 2.25rem 2rem 1.5rem;
+    text-align: center;
+    border-bottom: 1px solid var(--c-border);
+}
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">
-                            <i class="fas fa-lock"></i> Contraseña
-                        </label>
+.login-logo {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--c-accent) 0%, #e67e00 100%);
+    border-radius: 14px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; color: #000;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 24px rgba(245,166,35,.35);
+}
 
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="password"
-                            name="password"
-                            required
-                        >
-                    </div>
+.login-title {
+    font-family: var(--font-head);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--c-text);
+    letter-spacing: -.03em;
+    line-height: 1;
+    margin: 0 0 .3rem;
+}
+.login-title span { color: var(--c-accent); }
 
-                    <button type="submit" class="btn btn-primary w-100">
-                        <i class="fas fa-sign-in-alt"></i> Ingresar
-                    </button>
+.login-sub {
+    font-size: .8rem;
+    color: var(--c-muted);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
 
-                </form>
+/* ─── CARD BODY ─── */
+.login-body {
+    padding: 1.75rem 2rem 1.75rem;
+}
 
-                <div class="text-center mt-3">
-                    <a href="{{ url_for('auth.forgot_password') }}">
-                        <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
+/* ─── FORM FIELDS ─── */
+.qs-field {
+    margin-bottom: 1.15rem;
+}
+.qs-field label {
+    display: flex; align-items: center; gap: .45rem;
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--c-muted);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-bottom: .45rem;
+}
+.qs-field label i { color: var(--c-accent); font-size: .75rem; }
 
-                <hr>
+.qs-input-wrap {
+    position: relative;
+}
+.qs-input {
+    width: 100%;
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 9px;
+    color: var(--c-text);
+    font-family: var(--font-body);
+    font-size: .92rem;
+    padding: .72rem 1rem .72rem 2.6rem;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+.qs-input::placeholder { color: var(--c-muted); opacity: .7; }
+.qs-input:focus {
+    border-color: var(--c-accent);
+    box-shadow: 0 0 0 3px rgba(245,166,35,.12);
+}
+.qs-input-icon {
+    position: absolute; left: .85rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--c-muted); font-size: .8rem; pointer-events: none;
+    transition: color .2s;
+}
+.qs-input:focus ~ .qs-input-icon,
+.qs-input-wrap:focus-within .qs-input-icon { color: var(--c-accent); }
 
-                <div class="text-center">
-                    <small class="text-muted">
-                        Usuarios: ADM-001, CAJ-001, CAJ-002 | Contraseña: ***
-                    </small>
-                </div>
+/* password toggle */
+.qs-pwd-toggle {
+    position: absolute; right: .85rem; top: 50%;
+    transform: translateY(-50%);
+    color: var(--c-muted); font-size: .8rem;
+    cursor: pointer; background: none; border: none;
+    padding: 0; transition: color .2s;
+}
+.qs-pwd-toggle:hover { color: var(--c-text); }
 
-            </div>
+/* ─── SUBMIT BUTTON ─── */
+.qs-btn-login {
+    width: 100%;
+    background: var(--c-accent);
+    color: #000;
+    border: none;
+    border-radius: 9px;
+    font-family: var(--font-head);
+    font-size: .95rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    padding: .8rem;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    margin-top: 1.5rem;
+}
+.qs-btn-login:hover {
+    background: #e8930a;
+    box-shadow: 0 6px 20px rgba(245,166,35,.35);
+    transform: translateY(-1px);
+}
+.qs-btn-login:active { transform: translateY(0); }
 
+/* ─── LINKS / FOOTER ─── */
+.login-links {
+    text-align: center;
+    margin-top: 1.25rem;
+}
+.login-links a {
+    color: var(--c-muted);
+    font-size: .82rem;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: .4rem;
+    transition: color .2s;
+}
+.login-links a:hover { color: var(--c-accent); }
+
+
+</style>
+
+<div class="login-wrap">
+    <div class="login-card">
+
+        <!-- HEADER -->
+        <div class="login-header">
+            <div class="login-logo"><i class="fas fa-store"></i></div>
+            <div class="login-title">Quick<span>Store</span></div>
+            <div class="login-sub">MiniMarket · Acceso al sistema</div>
         </div>
 
+        <!-- BODY -->
+        <div class="login-body">
+            <form method="POST" autocomplete="off">
+
+                <!-- Usuario -->
+                <div class="qs-field">
+                    <label for="username">
+                        <i class="fas fa-id-badge"></i> Código de usuario
+                    </label>
+                    <div class="qs-input-wrap">
+                        <input
+                            class="qs-input"
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Ej: ADM-001"
+                            required
+                            autofocus
+                        >
+                        <i class="fas fa-user qs-input-icon"></i>
+                    </div>
+                </div>
+
+                <!-- Contraseña -->
+                <div class="qs-field">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                    <div class="qs-input-wrap">
+                        <input
+                            class="qs-input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            required
+                        >
+                        <i class="fas fa-lock qs-input-icon"></i>
+                        <button type="button" class="qs-pwd-toggle" id="pwdToggle" tabindex="-1" aria-label="Mostrar contraseña">
+                            <i class="fas fa-eye" id="pwdToggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="qs-btn-login">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Ingresar
+                </button>
+
+            </form>
+
+            <!-- Forgot password -->
+            <div class="login-links">
+                <a href="{{ url_for('auth.forgot_password') }}">
+                    <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+                </a>
+            </div>
+
+
+        </div>
     </div>
 </div>
+
+<script>
+(function () {
+    const toggle = document.getElementById('pwdToggle');
+    const input  = document.getElementById('password');
+    const icon   = document.getElementById('pwdToggleIcon');
+    toggle?.addEventListener('click', function () {
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        icon.classList.toggle('fa-eye',      !show);
+        icon.classList.toggle('fa-eye-slash', show);
+    });
+})();
+</script>
 
 {% endblock %}

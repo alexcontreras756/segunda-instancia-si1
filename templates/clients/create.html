@@ -3,47 +3,103 @@
 {% block title %}Crear Cliente{% endblock %}
 
 {% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-user-plus"></i> Nuevo Cliente</h1>
+    <p>Registrar un nuevo cliente en el sistema MiniMarket QuickStore.</p>
+</div>
+
 <div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
+    <div class="col-md-7">
+
+        <div class="card system-card">
             <div class="card-header bg-primary text-white">
-                <h4><i class="fas fa-user-plus"></i> Nuevo Cliente</h4>
+                <h5><i class="fas fa-user"></i> Datos del cliente</h5>
             </div>
+
             <div class="card-body">
+
                 <form method="POST">
-                    <!-- Campo CI (document_id) -->
+
+                    <!-- Campo CI -->
                     <div class="mb-3">
                         <label for="ci" class="form-label">CI *</label>
-                        <input type="text" class="form-control" id="ci" name="ci" required>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="ci"
+                            name="ci"
+                            required
+                            placeholder="Ej: 12345678"
+                        >
                     </div>
 
-                    <!-- Campo Nombre Completo (full_name) -->
+                    <!-- Campo Nombre Completo -->
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre Completo *</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nombre"
+                            name="nombre"
+                            required
+                            placeholder="Ej: Juan Pérez"
+                        >
+                    </div>
+
+                    <!-- Campo Tipo de Cliente -->
+                    <div class="mb-3">
+                        <label for="tipo_cliente" class="form-label">Tipo de Cliente *</label>
+                        <select
+                            class="form-select"
+                            id="tipo_cliente"
+                            name="tipo_cliente"
+                            required
+                        >
+                            <option value="">Seleccione tipo de cliente</option>
+                            <option value="temporal">Temporal</option>
+                            <option value="permanente">Permanente</option>
+                        </select>
                     </div>
 
                     <!-- Campo Email -->
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email">
+                        <label for="email" class="form-label">Correo electrónico</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            placeholder="Ej: cliente@gmail.com"
+                        >
                     </div>
 
                     <!-- Campo Teléfono -->
                     <div class="mb-3">
                         <label for="telefono" class="form-label">Teléfono</label>
-                        <input type="text" class="form-control" id="telefono" name="telefono">
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="telefono"
+                            name="telefono"
+                            placeholder="Ej: 70000000"
+                        >
                     </div>
 
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Guardar
                     </button>
+
                     <a href="{{ url_for('clients.list_clients') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Cancelar
                     </a>
+
                 </form>
+
             </div>
         </div>
+
     </div>
 </div>
+
 {% endblock %}
