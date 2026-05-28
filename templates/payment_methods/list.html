@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Métodos de Pago{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-credit-card"></i> Gestión de Métodos de Pago</h1>
+    <p>Administra los métodos de pago disponibles para ventas y caja.</p>
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-6 mb-3">
+        <div class="card system-card bg-success text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-check-circle"></i> Métodos activos</h5>
+                <h2>{{ active_count or 0 }}</h2>
+                <p class="mb-0">Disponibles para registrar ventas</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card system-card bg-secondary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-ban"></i> Métodos inactivos</h5>
+                <h2>{{ inactive_count or 0 }}</h2>
+                <p class="mb-0">Ocultos en nuevas ventas</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card system-card mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-search"></i> Buscar método de pago</h5>
+    </div>
+
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+
+            <div class="col-md-10">
+                <label for="search" class="form-label">Buscar</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="search"
+                    name="search"
+                    value="{{ search or '' }}"
+                    placeholder="Buscar por nombre o descripción"
+                >
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4 class="mb-0">
+        <i class="fas fa-list"></i> Métodos registrados
+    </h4>
+
+    <a href="{{ url_for('payment_methods.create_payment_method') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nuevo Método
+    </a>
+</div>
+
+<div class="card system-card">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-credit-card"></i> Lista de métodos de pago</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="alert alert-info">
+            <strong>Nota:</strong>
+            Los métodos de pago no se eliminan físicamente para no afectar ventas ni cierres de caja anteriores.
+            Al desactivarlos, dejan de aparecer en nuevas ventas.
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for method in payment_methods %}
+                    <tr>
+                        <td>
+                            <strong>{{ method.id }}</strong>
+                        </td>
+
+                        <td>
+                            <strong>{{ method.nombre }}</strong>
+                        </td>
+
+                        <td>
+                            {{ method.descripcion or '-' }}
+                        </td>
+
+                        <td>
+                            {% if method.activo %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> Activo
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-ban"></i> Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('payment_methods.edit_payment_method', payment_method_id=method.id) }}"
+                               class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            {% if method.activo %}
+                                <a href="{{ url_for('payment_methods.toggle_payment_method', payment_method_id=method.id) }}"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('¿Desactivar este método de pago? Ya no aparecerá en nuevas ventas.')">
+                                    <i class="fas fa-ban"></i>
+                                </a>
+                            {% else %}
+                                <a href="{{ url_for('payment_methods.toggle_payment_method', payment_method_id=method.id) }}"
+                                   class="btn btn-sm btn-success"
+                                   onclick="return confirm('¿Activar este método de pago?')">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No hay métodos de pago registrados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

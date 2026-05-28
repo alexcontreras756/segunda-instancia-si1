@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Notas de Salida{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-file-export"></i> Gestión de Notas de Salida</h1>
+    <p>Registro y control de salidas administrativas de productos del inventario.</p>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4 class="mb-0">
+        <i class="fas fa-list"></i> Notas registradas
+    </h4>
+
+    <a href="{{ url_for('output_notes.create_output_note') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nueva Nota de Salida
+    </a>
+</div>
+
+<div class="card system-card">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-file-export"></i> Lista de notas de salida</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="alert alert-info">
+            <strong>Nota:</strong>
+            Las notas de salida descuentan stock del inventario. Si una nota se anula, el sistema devuelve las cantidades a los lotes originales.
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código</th>
+                        <th>Fecha</th>
+                        <th>Almacén</th>
+                        <th>Usuario</th>
+                        <th>Motivo</th>
+                        <th>Destino</th>
+                        <th>Ítems</th>
+                        <th>Unidades</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for note in notes %}
+                    <tr>
+                        <td>
+                            <strong>{{ note.codigo }}</strong>
+                        </td>
+
+                        <td>
+                            {{ note.fecha_hora.strftime('%d/%m/%Y %H:%M') }}
+                        </td>
+
+                        <td>
+                            {{ note.almacen }}
+                            <br>
+                            <small class="text-muted">{{ note.codigo_almacen }}</small>
+                        </td>
+
+                        <td>
+                            {{ note.usuario }}
+                            <br>
+                            <small class="text-muted">{{ note.codigo_usuario }}</small>
+                        </td>
+
+                        <td>{{ note.motivo }}</td>
+
+                        <td>{{ note.destino or '-' }}</td>
+
+                        <td>
+                            <span class="badge bg-primary">{{ note.total_items }}</span>
+                        </td>
+
+                        <td>
+                            <strong>{{ note.total_unidades }}</strong>
+                        </td>
+
+                        <td>
+                            {% if note.estado %}
+                                <span class="badge bg-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Anulada</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('output_notes.detail_output_note', codigo=note.codigo) }}"
+                               class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+
+                            {% if note.estado %}
+                            <a href="{{ url_for('output_notes.cancel_output_note', codigo=note.codigo) }}"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('¿Anular esta nota de salida? El stock será devuelto al inventario.')">
+                                <i class="fas fa-ban"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted">
+                            No hay notas de salida registradas.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

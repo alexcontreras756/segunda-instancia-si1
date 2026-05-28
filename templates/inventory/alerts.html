@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Alertas de Stock{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-triangle-exclamation"></i> Alertas de Stock</h1>
+    <p>Productos cuyo stock total está igual o por debajo del stock mínimo configurado.</p>
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-4 mb-3">
+        <div class="card system-card bg-warning text-dark">
+            <div class="card-body">
+                <h5><i class="fas fa-triangle-exclamation"></i> Productos en alerta</h5>
+                <h2>{{ counters.low_stock or 0 }}</h2>
+                <p class="mb-0">Stock bajo o agotado</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card system-card bg-danger text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-circle-xmark"></i> Agotados</h5>
+                <h2>{{ counters.out_of_stock or 0 }}</h2>
+                <p class="mb-0">Productos sin stock disponible</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card system-card bg-primary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-box"></i> Unidades totales</h5>
+                <h2>{{ counters.total_units or 0 }}</h2>
+                <p class="mb-0">Inventario activo general</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card system-card mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-search"></i> Buscar producto en alerta</h5>
+    </div>
+
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+
+            <div class="col-md-10">
+                <label for="search" class="form-label">Buscar</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="search"
+                    name="search"
+                    value="{{ search or '' }}"
+                    placeholder="Nombre o código del producto"
+                >
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+
+    <h4 class="mb-0">
+        <i class="fas fa-list"></i> Productos con alerta
+    </h4>
+
+    <div>
+        <a href="{{ url_for('inventory.list_inventory') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al inventario
+        </a>
+
+        <a href="{{ url_for('inventory.adjust_inventory') }}" class="btn btn-primary">
+            <i class="fas fa-sliders"></i> Ajustar inventario
+        </a>
+    </div>
+
+</div>
+
+<div class="card system-card">
+    <div class="card-header bg-warning text-dark">
+        <h5><i class="fas fa-triangle-exclamation"></i> Alertas detectadas</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="alert alert-info">
+            <strong>Regla de alerta:</strong>
+            el sistema compara el stock total disponible del producto contra su stock mínimo.
+            Si el stock total es menor o igual al stock mínimo, se muestra como alerta.
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th>Stock actual</th>
+                        <th>Stock mínimo</th>
+                        <th>Precio venta</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in alerts %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.codigo_producto }}</strong>
+                        </td>
+
+                        <td>
+                            {{ item.producto }}
+                        </td>
+
+                        <td>
+                            <strong>{{ item.stock_total }}</strong>
+                        </td>
+
+                        <td>
+                            {{ item.stock_minimo }}
+                        </td>
+
+                        <td>
+                            Bs {{ "%.2f"|format((item.precio_venta or 0)|float) }}
+                        </td>
+
+                        <td>
+                            {% if item.estado_stock == 'agotado' %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-circle-xmark"></i> Agotado
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="fas fa-triangle-exclamation"></i> Stock bajo
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('inventory.adjust_inventory', codigo_producto=item.codigo_producto) }}"
+                               class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus"></i> Reponer / Ajustar
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">
+                            No hay productos con alerta de stock.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,459 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Compra{% endblock %}
+
+{% block content %}
+
+<style>
+    .purchase-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .purchase-form-control {
+        min-height: 46px;
+        font-size: 15px;
+    }
+
+    .purchase-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 14px;
+    }
+
+    .purchase-table {
+        min-width: 1120px;
+        margin-bottom: 0;
+    }
+
+    .purchase-table th {
+        white-space: nowrap;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    .purchase-table td {
+        vertical-align: middle;
+    }
+
+    .purchase-product-select {
+        min-width: 300px;
+    }
+
+    .purchase-small-input {
+        min-width: 110px;
+    }
+
+    .purchase-price-input {
+        min-width: 130px;
+    }
+
+    .purchase-date-input {
+        min-width: 160px;
+    }
+
+    .purchase-subtotal-input {
+        min-width: 130px;
+        background: #e9ecef;
+        font-weight: 700;
+    }
+
+    .purchase-help {
+        color: #6c757d;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    .product-empty-message {
+        display: none;
+        margin-top: 12px;
+    }
+</style>
+
+<div class="page-header">
+    <h1><i class="fas fa-cart-plus"></i> Registrar Compra</h1>
+    <p>Seleccione proveedor, almacén y productos para registrar una nueva compra.</p>
+</div>
+
+<form method="POST" id="purchase-form">
+
+    <div class="purchase-layout">
+
+        <div class="card system-card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-truck"></i> Datos de la compra</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label for="codigo_proveedor" class="form-label">Proveedor *</label>
+                        <select class="form-select purchase-form-control" id="codigo_proveedor" name="codigo_proveedor" required>
+                            <option value="">Seleccione proveedor</option>
+
+                            {% for provider in providers %}
+                            <option value="{{ provider.codigo }}">
+                                {{ provider.nombre }} - {{ provider.codigo }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <div class="purchase-help">
+                            Al seleccionar proveedor, solo aparecerán sus productos.
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="codigo_almacen" class="form-label">Almacén destino *</label>
+                        <select class="form-select purchase-form-control" id="codigo_almacen" name="codigo_almacen" required>
+                            <option value="">Seleccione almacén</option>
+
+                            {% for warehouse in warehouses %}
+                            <option value="{{ warehouse.codigo }}">
+                                {{ warehouse.nombre }} - {{ warehouse.codigo }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="observacion" class="form-label">Observación</label>
+                        <textarea
+                            class="form-control"
+                            id="observacion"
+                            name="observacion"
+                            rows="3"
+                            placeholder="Ej: Compra semanal, reposición de stock, factura del proveedor, etc."
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <div class="alert alert-info mb-0">
+                    <strong>Costo unitario:</strong> es el precio que pagas al proveedor por cada unidad comprada.
+                    Ejemplo: si compras 10 unidades a Bs 7 cada una, el costo unitario es 7.
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card system-card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-boxes"></i> Productos comprados</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="purchase-table-wrapper">
+                    <table class="table table-bordered align-middle purchase-table">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Costo unitario</th>
+                                <th>Precio venta</th>
+                                <th>Vencimiento</th>
+                                <th>Subtotal</th>
+                                <th>Quitar</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="items-body">
+                            <tr class="item-row">
+                                <td>
+                                    <select class="form-select product-select purchase-product-select"
+                                            name="codigo_producto[]"
+                                            required
+                                            disabled>
+                                        <option value=""
+                                                data-provider=""
+                                                data-cost="0"
+                                                data-sale="0">
+                                            Primero seleccione proveedor
+                                        </option>
+
+                                        {% for product in products %}
+                                        <option value="{{ product.codigo }}"
+                                                data-provider="{{ product.codigo_proveedor or '' }}"
+                                                data-cost="{{ product.precio_compra or 0 }}"
+                                                data-sale="{{ product.precio_venta or 0 }}">
+                                            {{ product.nombre }} - {{ product.codigo }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        class="form-control quantity-input purchase-small-input"
+                                        name="cantidad[]"
+                                        value="1"
+                                        required
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        class="form-control cost-input purchase-price-input"
+                                        name="costo_unitario[]"
+                                        value=""
+                                        placeholder="Ej: 7.50"
+                                        required
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        class="form-control sale-price-input purchase-price-input"
+                                        name="precio_venta[]"
+                                        value=""
+                                        placeholder="Ej: 10.00"
+                                        required
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="date"
+                                        class="form-control expiration-input purchase-date-input"
+                                        name="fecha_vencimiento[]"
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="text"
+                                        class="form-control subtotal-input purchase-subtotal-input"
+                                        value="0.00"
+                                        readonly
+                                    >
+                                </td>
+
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-danger btn-sm remove-row">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-warning product-empty-message" id="product-empty-message">
+                    Este proveedor no tiene productos asociados. Debes asignar productos a este proveedor en Gestión de Productos.
+                </div>
+
+                <button type="button" class="btn btn-secondary mt-3" id="add-row">
+                    <i class="fas fa-plus"></i> Agregar producto
+                </button>
+
+            </div>
+        </div>
+
+        <div class="card system-card">
+            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                <div>
+                    <h4 class="mb-0">
+                        Total compra:
+                        <span class="text-success">
+                            Bs <span id="total-purchase">0.00</span>
+                        </span>
+                    </h4>
+                </div>
+
+                <div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Registrar Compra
+                    </button>
+
+                    <a href="{{ url_for('purchases.list_purchases') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const providerSelect = document.getElementById('codigo_proveedor');
+    const itemsBody = document.getElementById('items-body');
+    const addRowButton = document.getElementById('add-row');
+    const totalPurchase = document.getElementById('total-purchase');
+    const emptyMessage = document.getElementById('product-empty-message');
+
+    function toNumber(value) {
+        if (!value) return 0;
+        value = String(value).replace(',', '.');
+        const number = parseFloat(value);
+        return isNaN(number) ? 0 : number;
+    }
+
+    function updateRow(row) {
+        const quantityInput = row.querySelector('.quantity-input');
+        const costInput = row.querySelector('.cost-input');
+        const subtotalInput = row.querySelector('.subtotal-input');
+
+        const quantity = parseInt(quantityInput.value) || 0;
+        const cost = toNumber(costInput.value);
+        const subtotal = quantity * cost;
+
+        subtotalInput.value = subtotal.toFixed(2);
+
+        updateTotal();
+    }
+
+    function updateTotal() {
+        let total = 0;
+
+        document.querySelectorAll('.subtotal-input').forEach(function (input) {
+            total += toNumber(input.value);
+        });
+
+        totalPurchase.textContent = total.toFixed(2);
+    }
+
+    function resetRow(row) {
+        const productSelect = row.querySelector('.product-select');
+        const quantityInput = row.querySelector('.quantity-input');
+        const costInput = row.querySelector('.cost-input');
+        const salePriceInput = row.querySelector('.sale-price-input');
+        const expirationInput = row.querySelector('.expiration-input');
+        const subtotalInput = row.querySelector('.subtotal-input');
+
+        productSelect.selectedIndex = 0;
+        quantityInput.value = 1;
+        costInput.value = '';
+        salePriceInput.value = '';
+        expirationInput.value = '';
+        subtotalInput.value = '0.00';
+    }
+
+    function filterProductsByProvider() {
+        const selectedProvider = providerSelect.value;
+        let totalAvailable = 0;
+
+        document.querySelectorAll('.item-row').forEach(function (row) {
+            const productSelect = row.querySelector('.product-select');
+            const options = productSelect.querySelectorAll('option');
+
+            resetRow(row);
+
+            options.forEach(function (option, index) {
+                if (index === 0) {
+                    if (selectedProvider) {
+                        option.textContent = 'Seleccione producto';
+                    } else {
+                        option.textContent = 'Primero seleccione proveedor';
+                    }
+
+                    option.hidden = false;
+                    return;
+                }
+
+                const productProvider = option.dataset.provider;
+
+                if (selectedProvider && productProvider === selectedProvider) {
+                    option.hidden = false;
+                    totalAvailable++;
+                } else {
+                    option.hidden = true;
+                }
+            });
+
+            productSelect.disabled = !selectedProvider;
+        });
+
+        if (selectedProvider && totalAvailable === 0) {
+            emptyMessage.style.display = 'block';
+        } else {
+            emptyMessage.style.display = 'none';
+        }
+
+        updateTotal();
+    }
+
+    function createNewRow() {
+        const firstRow = document.querySelector('.item-row');
+        const newRow = firstRow.cloneNode(true);
+
+        itemsBody.appendChild(newRow);
+
+        filterProductsByProvider();
+
+        return newRow;
+    }
+
+    providerSelect.addEventListener('change', function () {
+        filterProductsByProvider();
+    });
+
+    addRowButton.addEventListener('click', function () {
+        createNewRow();
+    });
+
+    itemsBody.addEventListener('change', function (event) {
+        if (event.target.classList.contains('product-select')) {
+            const row = event.target.closest('.item-row');
+            const selectedOption = event.target.options[event.target.selectedIndex];
+
+            const cost = toNumber(selectedOption.dataset.cost);
+            const sale = toNumber(selectedOption.dataset.sale);
+
+            const costInput = row.querySelector('.cost-input');
+            const salePriceInput = row.querySelector('.sale-price-input');
+
+            costInput.value = cost > 0 ? cost.toFixed(2) : '';
+            salePriceInput.value = sale > 0 ? sale.toFixed(2) : '';
+
+            updateRow(row);
+        }
+    });
+
+    itemsBody.addEventListener('input', function (event) {
+        if (
+            event.target.classList.contains('quantity-input') ||
+            event.target.classList.contains('cost-input')
+        ) {
+            const row = event.target.closest('.item-row');
+            updateRow(row);
+        }
+    });
+
+    itemsBody.addEventListener('click', function (event) {
+        const button = event.target.closest('.remove-row');
+
+        if (button) {
+            const rows = document.querySelectorAll('.item-row');
+
+            if (rows.length <= 1) {
+                alert('Debe existir al menos un producto en la compra.');
+                return;
+            }
+
+            button.closest('.item-row').remove();
+            updateTotal();
+        }
+    });
+
+    filterProductsByProvider();
+});
+</script>
+
+{% endblock %}

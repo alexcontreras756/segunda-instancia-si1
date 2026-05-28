@@ -10,6 +10,10 @@ from models.provider import Provider
 from models.sale import Sale
 from models.cash import Cash
 from models.warehouse import Warehouse
+from models.purchase import Purchase
+from models.inventory import Inventory
+from models.output_note import OutputNote
+from models.payment_method import PaymentMethod
 
 from utils.decorators import login_required
 
@@ -23,6 +27,11 @@ from controllers.provider_controller import provider_bp
 from controllers.sale_controller import sale_bp
 from controllers.cash_controller import cash_bp
 from controllers.warehouse_controller import warehouse_bp
+from controllers.purchase_controller import purchase_bp
+from controllers.inventory_controller import inventory_bp
+from controllers.output_note_controller import output_note_bp
+from controllers.payment_method_controller import payment_method_bp
+
 
 app = Flask(__name__)
 app.config.from_object(config['development'])
@@ -49,8 +58,10 @@ def clear_session_if_needed():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
 
+    return None
 
-# Registra todos los Blueprints
+
+# Registrar todos los Blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(permission_bp)
@@ -61,6 +72,10 @@ app.register_blueprint(provider_bp)
 app.register_blueprint(sale_bp)
 app.register_blueprint(cash_bp)
 app.register_blueprint(warehouse_bp)
+app.register_blueprint(purchase_bp)
+app.register_blueprint(inventory_bp)
+app.register_blueprint(output_note_bp)
+app.register_blueprint(payment_method_bp)
 
 
 # Rutas principales
@@ -96,6 +111,10 @@ def dashboard():
     can_view_sales = Permission.has_permission(codigo_usuario, 'sale_read')
     can_view_cash = Permission.has_permission(codigo_usuario, 'cash_read')
     can_view_warehouses = Permission.has_permission(codigo_usuario, 'warehouse_read')
+    can_view_purchases = Permission.has_permission(codigo_usuario, 'purchase_read')
+    can_view_inventory = Permission.has_permission(codigo_usuario, 'inventory_read')
+    can_view_output_notes = Permission.has_permission(codigo_usuario, 'output_note_read')
+    can_view_payment_methods = Permission.has_permission(codigo_usuario, 'payment_method_read')
 
     stats = {}
 
@@ -134,6 +153,20 @@ def dashboard():
     if can_view_warehouses:
         stats['warehouses'] = Warehouse.count_all()
 
+    if can_view_purchases:
+        stats['purchases'] = Purchase.count_all()
+
+    if can_view_inventory:
+        stats['inventory_items'] = Inventory.count_inventory_items()
+        stats['low_stock'] = Inventory.count_low_stock()
+
+    if can_view_output_notes:
+        stats['output_notes'] = OutputNote.count_all()
+
+    if can_view_payment_methods:
+        stats['payment_methods'] = PaymentMethod.count_all(active_only=True)
+        stats['payment_methods_inactive'] = PaymentMethod.count_inactive()
+
     # Diccionario con permisos para mostrar los bloques correspondientes
     permissions_dashboard = {
         'can_view_users': can_view_users,
@@ -144,7 +177,11 @@ def dashboard():
         'can_view_providers': can_view_providers,
         'can_view_sales': can_view_sales,
         'can_view_cash': can_view_cash,
-        'can_view_warehouses': can_view_warehouses
+        'can_view_warehouses': can_view_warehouses,
+        'can_view_purchases': can_view_purchases,
+        'can_view_inventory': can_view_inventory,
+        'can_view_output_notes': can_view_output_notes,
+        'can_view_payment_methods': can_view_payment_methods
     }
 
     return render_template(

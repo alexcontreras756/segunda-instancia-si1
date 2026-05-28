@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Método de Pago{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-edit"></i> Editar Método de Pago</h1>
+    <p>Modifica los datos o el estado del método de pago seleccionado.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="card system-card">
+            <div class="card-header bg-warning">
+                <h5><i class="fas fa-credit-card"></i> Método: {{ payment_method.nombre }}</h5>
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label">ID</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ payment_method.id }}"
+                            disabled
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre *</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nombre"
+                            name="nombre"
+                            value="{{ payment_method.nombre }}"
+                            required
+                            maxlength="50"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea
+                            class="form-control"
+                            id="descripcion"
+                            name="descripcion"
+                            rows="3"
+                            maxlength="150"
+                        >{{ payment_method.descripcion or '' }}</textarea>
+                        <small class="text-muted">
+                            Máximo 150 caracteres.
+                        </small>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            role="switch"
+                            id="activo"
+                            name="activo"
+                            {% if payment_method.activo %}checked{% endif %}
+                        >
+                        <label class="form-check-label" for="activo">
+                            Método de pago activo
+                        </label>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Importante:</strong>
+                        Si desactivas este método, no aparecerá en nuevas ventas.
+                        Las ventas antiguas y los cierres de caja seguirán conservando su información.
+                    </div>
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save"></i> Actualizar
+                    </button>
+
+                    <a href="{{ url_for('payment_methods.list_payment_methods') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

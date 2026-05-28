@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Compra{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-receipt"></i> Detalle de Compra {{ purchase.codigo }}</h1>
+    <p>Información completa de la compra registrada.</p>
+</div>
+
+<div class="row">
+
+    <div class="col-md-5 mb-3">
+        <div class="card system-card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-info-circle"></i> Datos generales</h5>
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    <strong>Código:</strong>
+                    {{ purchase.codigo }}
+                </p>
+
+                <p>
+                    <strong>Fecha:</strong>
+                    {{ purchase.fecha_hora.strftime('%d/%m/%Y %H:%M:%S') }}
+                </p>
+
+                <p>
+                    <strong>Proveedor:</strong>
+                    {{ purchase.proveedor }}
+                    <br>
+                    <small class="text-muted">{{ purchase.codigo_proveedor }}</small>
+                </p>
+
+                <p>
+                    <strong>Almacén destino:</strong>
+                    {{ purchase.almacen }}
+                    <br>
+                    <small class="text-muted">{{ purchase.codigo_almacen }}</small>
+                </p>
+
+                <p>
+                    <strong>Usuario:</strong>
+                    {{ purchase.usuario }}
+                    <br>
+                    <small class="text-muted">{{ purchase.codigo_usuario }}</small>
+                </p>
+
+                <p>
+                    <strong>Estado:</strong>
+                    {% if purchase.estado %}
+                        <span class="badge bg-success">Activa</span>
+                    {% else %}
+                        <span class="badge bg-danger">Anulada</span>
+                    {% endif %}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7 mb-3">
+        <div class="card system-card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-money-bill"></i> Resumen de compra</h5>
+            </div>
+
+            <div class="card-body">
+
+                <h5>Monto total:</h5>
+
+                <h2 class="text-success">
+                    Bs {{ "%.2f"|format((purchase.monto_total or 0)|float) }}
+                </h2>
+
+                <hr>
+
+                <p>
+                    <strong>Observación:</strong>
+                    {{ purchase.observacion or 'Sin observación' }}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card system-card mt-3">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-boxes"></i> Productos comprados</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código Producto</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio Compra</th>
+                        <th>Subtotal</th>
+                        <th>Vencimiento</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for detail in details %}
+                    <tr>
+                        <td>{{ detail.codigo_producto }}</td>
+
+                        <td>{{ detail.producto }}</td>
+
+                        <td>{{ detail.cantidad }}</td>
+
+                        <td>
+                            Bs {{ "%.2f"|format((detail.precio_unitario or 0)|float) }}
+                        </td>
+
+                        <td>
+                            <strong>
+                                Bs {{ "%.2f"|format((detail.subtotal or 0)|float) }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {% if detail.fecha_vencimiento %}
+                                {{ detail.fecha_vencimiento.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            No hay productos registrados en esta compra.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="4" class="text-end">TOTAL:</th>
+                        <th colspan="2">
+                            Bs {{ "%.2f"|format((purchase.monto_total or 0)|float) }}
+                        </th>
+                    </tr>
+                </tfoot>
+
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('purchases.list_purchases') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

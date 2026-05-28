@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Nota de Salida{% endblock %}
+
+{% block content %}
+
+<style>
+    .output-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .output-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 14px;
+    }
+
+    .output-table {
+        min-width: 980px;
+        margin-bottom: 0;
+    }
+
+    .output-product-select {
+        min-width: 310px;
+    }
+
+    .output-small-input {
+        min-width: 120px;
+    }
+
+    .output-observation-input {
+        min-width: 240px;
+    }
+
+    .output-help {
+        color: #6c757d;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+    .stock-badge {
+        display: inline-block;
+        min-width: 70px;
+    }
+</style>
+
+<div class="page-header">
+    <h1><i class="fas fa-file-export"></i> Registrar Nota de Salida</h1>
+    <p>Seleccione almacén y productos para descontar stock por una salida administrativa.</p>
+</div>
+
+<form method="POST" id="output-note-form">
+
+    <div class="output-layout">
+
+        <div class="card system-card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-info-circle"></i> Datos de la salida</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="alert alert-warning">
+                    <strong>Importante:</strong>
+                    esta operación descuenta stock del inventario. Para ventas use Registrar Venta; para reposición use Registrar Compra.
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <label for="codigo_almacen" class="form-label">Almacén *</label>
+                        <select class="form-select" id="codigo_almacen" name="codigo_almacen" required>
+                            <option value="">Seleccione almacén</option>
+
+                            {% for warehouse in warehouses %}
+                            <option value="{{ warehouse.codigo }}">
+                                {{ warehouse.nombre }} - {{ warehouse.codigo }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <div class="output-help">
+                            Al seleccionar almacén, solo aparecerán productos con stock en ese almacén.
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="motivo" class="form-label">Motivo *</label>
+                        <select class="form-select" id="motivo" name="motivo" required>
+                            <option value="">Seleccione motivo</option>
+                            <option value="Merma">Merma</option>
+                            <option value="Producto dañado">Producto dañado</option>
+                            <option value="Consumo interno">Consumo interno</option>
+                            <option value="Transferencia interna">Transferencia interna</option>
+                            <option value="Donación">Donación</option>
+                            <option value="Vencimiento">Vencimiento</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="destino" class="form-label">Destino / Área</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="destino"
+                            name="destino"
+                            placeholder="Ej: Área administrativa, almacén secundario, merma"
+                        >
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label for="observacion" class="form-label">Observación general</label>
+                    <textarea
+                        class="form-control"
+                        id="observacion"
+                        name="observacion"
+                        rows="3"
+                        placeholder="Ej: Salida por productos dañados encontrados en conteo físico"
+                    ></textarea>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card system-card">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="mb-0"><i class="fas fa-boxes-stacked"></i> Productos de salida</h5>
+
+                <button type="button" class="btn btn-success btn-sm" id="add-row-btn">
+                    <i class="fas fa-plus"></i> Agregar producto
+                </button>
+            </div>
+
+            <div class="card-body">
+
+                <div class="output-table-wrapper">
+                    <table class="table table-hover align-middle output-table" id="products-table">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Stock disponible</th>
+                                <th>Cantidad</th>
+                                <th>Observación</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="products-body">
+                            <tr class="product-row">
+                                <td>
+                                    <select class="form-select output-product-select product-select"
+                                            name="codigo_producto[]"
+                                            required>
+                                        <option value="">Seleccione producto</option>
+
+                                        {% for product in products %}
+                                        <option
+                                            value="{{ product.codigo }}"
+                                            data-warehouse="{{ product.codigo_almacen }}"
+                                            data-stock="{{ product.stock_disponible }}"
+                                            data-name="{{ product.nombre }}"
+                                        >
+                                            {{ product.nombre }} - {{ product.codigo }} | Stock: {{ product.stock_disponible }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-secondary stock-badge stock-label">0</span>
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        class="form-control output-small-input quantity-input"
+                                        name="cantidad[]"
+                                        required
+                                        placeholder="Ej: 1"
+                                    >
+                                </td>
+
+                                <td>
+                                    <input
+                                        type="text"
+                                        class="form-control output-observation-input"
+                                        name="detalle_observacion[]"
+                                        placeholder="Observación del producto"
+                                    >
+                                </td>
+
+                                <td>
+                                    <button type="button" class="btn btn-danger btn-sm remove-row-btn">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="alert alert-info mt-3 mb-0" id="stock-message">
+                    Seleccione un almacén para ver los productos disponibles.
+                </div>
+
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+            <a href="{{ url_for('output_notes.list_output_notes') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Registrar Nota de Salida
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const warehouseSelect = document.getElementById('codigo_almacen');
+    const productsBody = document.getElementById('products-body');
+    const addRowBtn = document.getElementById('add-row-btn');
+    const stockMessage = document.getElementById('stock-message');
+
+    function filterProductOptions(select) {
+        const selectedWarehouse = warehouseSelect.value;
+        const options = select.querySelectorAll('option');
+
+        options.forEach(function(option) {
+            if (!option.value) {
+                option.hidden = false;
+                option.disabled = false;
+                return;
+            }
+
+            const optionWarehouse = option.getAttribute('data-warehouse');
+
+            if (selectedWarehouse && optionWarehouse === selectedWarehouse) {
+                option.hidden = false;
+                option.disabled = false;
+            } else {
+                option.hidden = true;
+                option.disabled = true;
+            }
+        });
+
+        if (select.value) {
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (selectedOption.disabled) {
+                select.value = '';
+            }
+        }
+
+        updateStockLabel(select);
+    }
+
+    function updateAllProductOptions() {
+        const selectedWarehouse = warehouseSelect.value;
+        const selects = document.querySelectorAll('.product-select');
+
+        selects.forEach(function(select) {
+            filterProductOptions(select);
+        });
+
+        if (!selectedWarehouse) {
+            stockMessage.className = 'alert alert-info mt-3 mb-0';
+            stockMessage.textContent = 'Seleccione un almacén para ver los productos disponibles.';
+        } else {
+            stockMessage.className = 'alert alert-success mt-3 mb-0';
+            stockMessage.textContent = 'Productos filtrados según el almacén seleccionado.';
+        }
+    }
+
+    function updateStockLabel(select) {
+        const row = select.closest('tr');
+        const stockLabel = row.querySelector('.stock-label');
+        const quantityInput = row.querySelector('.quantity-input');
+
+        if (!select.value) {
+            stockLabel.textContent = '0';
+            stockLabel.className = 'badge bg-secondary stock-badge stock-label';
+            quantityInput.removeAttribute('max');
+            quantityInput.value = '';
+            return;
+        }
+
+        const selectedOption = select.options[select.selectedIndex];
+        const stock = selectedOption.getAttribute('data-stock') || '0';
+
+        stockLabel.textContent = stock;
+        stockLabel.className = 'badge bg-success stock-badge stock-label';
+
+        quantityInput.setAttribute('max', stock);
+
+        if (parseInt(quantityInput.value || '0') > parseInt(stock)) {
+            quantityInput.value = stock;
+        }
+    }
+
+    function attachEvents(row) {
+        const productSelect = row.querySelector('.product-select');
+        const quantityInput = row.querySelector('.quantity-input');
+        const removeBtn = row.querySelector('.remove-row-btn');
+
+        productSelect.addEventListener('change', function () {
+            updateStockLabel(productSelect);
+        });
+
+        quantityInput.addEventListener('input', function () {
+            const max = parseInt(quantityInput.getAttribute('max') || '0');
+            const value = parseInt(quantityInput.value || '0');
+
+            if (max > 0 && value > max) {
+                alert('La cantidad no puede ser mayor al stock disponible.');
+                quantityInput.value = max;
+            }
+        });
+
+        removeBtn.addEventListener('click', function () {
+            const rows = productsBody.querySelectorAll('.product-row');
+
+            if (rows.length <= 1) {
+                alert('Debe existir al menos una fila de producto.');
+                return;
+            }
+
+            row.remove();
+        });
+    }
+
+    addRowBtn.addEventListener('click', function () {
+        const firstRow = productsBody.querySelector('.product-row');
+        const newRow = firstRow.cloneNode(true);
+
+        newRow.querySelector('.product-select').value = '';
+        newRow.querySelector('.quantity-input').value = '';
+        newRow.querySelector('input[name="detalle_observacion[]"]').value = '';
+        newRow.querySelector('.stock-label').textContent = '0';
+        newRow.querySelector('.stock-label').className = 'badge bg-secondary stock-badge stock-label';
+
+        productsBody.appendChild(newRow);
+        attachEvents(newRow);
+        filterProductOptions(newRow.querySelector('.product-select'));
+    });
+
+    warehouseSelect.addEventListener('change', function () {
+        const selects = document.querySelectorAll('.product-select');
+
+        selects.forEach(function(select) {
+            select.value = '';
+            updateStockLabel(select);
+        });
+
+        updateAllProductOptions();
+    });
+
+    document.querySelectorAll('.product-row').forEach(function(row) {
+        attachEvents(row);
+    });
+
+    updateAllProductOptions();
+});
+</script>
+
+{% endblock %}

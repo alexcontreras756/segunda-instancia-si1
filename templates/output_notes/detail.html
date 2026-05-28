@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Nota de Salida{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-file-export"></i> Detalle de Nota de Salida {{ note.codigo }}</h1>
+    <p>Resumen del documento y productos descontados del inventario.</p>
+</div>
+
+<div class="row">
+
+    <div class="col-md-5 mb-3">
+        <div class="card system-card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-info-circle"></i> Datos generales</h5>
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    <strong>Código:</strong>
+                    {{ note.codigo }}
+                </p>
+
+                <p>
+                    <strong>Fecha:</strong>
+                    {{ note.fecha_hora.strftime('%d/%m/%Y %H:%M:%S') }}
+                </p>
+
+                <p>
+                    <strong>Almacén:</strong>
+                    {{ note.almacen }}
+                    <br>
+                    <small class="text-muted">{{ note.codigo_almacen }}</small>
+                </p>
+
+                <p>
+                    <strong>Dirección almacén:</strong>
+                    {{ note.almacen_direccion or '-' }}
+                </p>
+
+                <p>
+                    <strong>Usuario:</strong>
+                    {{ note.usuario }}
+                    <br>
+                    <small class="text-muted">{{ note.codigo_usuario }} - {{ note.usuario_rol }}</small>
+                </p>
+
+                <p>
+                    <strong>Estado:</strong>
+                    {% if note.estado %}
+                        <span class="badge bg-success">Activa</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Anulada</span>
+                    {% endif %}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7 mb-3">
+        <div class="card system-card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-chart-simple"></i> Resumen de salida</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Total ítems</small>
+                            <h3>{{ note.total_items }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Total unidades</small>
+                            <h3>{{ note.total_unidades }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Motivo</small>
+                            <h5>{{ note.motivo }}</h5>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <p>
+                    <strong>Destino / Área:</strong>
+                    {{ note.destino or '-' }}
+                </p>
+
+                <p>
+                    <strong>Observación general:</strong>
+                    {{ note.observacion or 'Sin observación' }}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card system-card mt-3">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-boxes-stacked"></i> Productos descontados</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Lotes descontados</th>
+                        <th>Observación</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for detail in details %}
+                    <tr>
+                        <td>
+                            <strong>{{ detail.producto }}</strong>
+                            <br>
+                            <small class="text-muted">{{ detail.codigo_producto }}</small>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-primary">
+                                {{ detail.cantidad }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ detail.lotes_usados or '-' }}
+                        </td>
+
+                        <td>
+                            {{ detail.observacion or '-' }}
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">
+                            No hay productos registrados en esta nota.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<div class="mt-3 d-flex gap-2 flex-wrap">
+
+    <a href="{{ url_for('output_notes.list_output_notes') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    {% if note.estado %}
+    <a href="{{ url_for('output_notes.cancel_output_note', codigo=note.codigo) }}"
+       class="btn btn-danger"
+       onclick="return confirm('¿Anular esta nota de salida? El stock será devuelto al inventario.')">
+        <i class="fas fa-ban"></i> Anular Nota de Salida
+    </a>
+    {% endif %}
+
+</div>
+
+{% endblock %}

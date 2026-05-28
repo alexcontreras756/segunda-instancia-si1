@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Inventario{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-box-open"></i> Detalle de Inventario</h1>
+    <p>Producto {{ detail.codigo_producto }} en almacén {{ detail.codigo_almacen }}.</p>
+</div>
+
+<div class="row">
+
+    <div class="col-md-5 mb-3">
+        <div class="card system-card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-info-circle"></i> Datos generales</h5>
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    <strong>Producto:</strong>
+                    {{ detail.producto }}
+                    <br>
+                    <small class="text-muted">{{ detail.codigo_producto }}</small>
+                </p>
+
+                <p>
+                    <strong>Almacén:</strong>
+                    {{ detail.almacen }}
+                    <br>
+                    <small class="text-muted">{{ detail.codigo_almacen }}</small>
+                </p>
+
+                <p>
+                    <strong>Dirección:</strong>
+                    {{ detail.almacen_direccion or '-' }}
+                </p>
+
+                <p>
+                    <strong>Precio compra:</strong>
+                    Bs {{ "%.2f"|format((detail.precio_compra or 0)|float) }}
+                </p>
+
+                <p>
+                    <strong>Precio venta:</strong>
+                    Bs {{ "%.2f"|format((detail.precio_venta or 0)|float) }}
+                </p>
+
+                <p>
+                    <strong>Estado stock:</strong>
+
+                    {% if detail.estado_stock == 'agotado' %}
+                        <span class="badge bg-danger">Agotado</span>
+                    {% elif detail.estado_stock == 'bajo' %}
+                        <span class="badge bg-warning text-dark">Stock bajo</span>
+                    {% else %}
+                        <span class="badge bg-success">Normal</span>
+                    {% endif %}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7 mb-3">
+        <div class="card system-card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-chart-simple"></i> Resumen de stock</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Stock en almacén</small>
+                            <h3>{{ detail.stock_almacen }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Stock total producto</small>
+                            <h3>{{ detail.stock_total_producto }}</h3>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <small class="text-muted">Stock mínimo</small>
+                            <h3>{{ detail.stock_minimo }}</h3>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <p>
+                    <strong>Capacidad actual del almacén:</strong>
+                    {{ detail.capacidad_actual or 0 }}
+                </p>
+
+                <p>
+                    <strong>Capacidad total del almacén:</strong>
+                    {% if detail.capacidad_total and detail.capacidad_total > 0 %}
+                        {{ detail.capacidad_total }}
+                    {% else %}
+                        Sin límite definido
+                    {% endif %}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card system-card mt-3">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-layer-group"></i> Lotes de inventario</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Cantidad</th>
+                        <th>Fecha entrada</th>
+                        <th>Fecha vencimiento</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for lot in lots %}
+                    <tr>
+                        <td>{{ lot.id }}</td>
+
+                        <td>
+                            <strong>{{ lot.cantidad }}</strong>
+                        </td>
+
+                        <td>
+                            {% if lot.fecha_entrada %}
+                                {{ lot.fecha_entrada.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if lot.fecha_vencimiento %}
+                                {{ lot.fecha_vencimiento.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if lot.estado and lot.cantidad > 0 %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Consumido</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">
+                            No hay lotes registrados para este producto en este almacén.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('inventory.list_inventory') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+
+            <a href="{{ url_for('inventory.adjust_inventory', codigo_almacen=detail.codigo_almacen, codigo_producto=detail.codigo_producto) }}"
+               class="btn btn-warning">
+                <i class="fas fa-sliders"></i> Ajustar inventario
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

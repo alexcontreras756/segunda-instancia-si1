@@ -163,6 +163,15 @@
     background: var(--c-green);
     flex-shrink: 0;
 }
+.card-sub .dot-warning {
+    background: #facc15;
+}
+.card-sub .dot-danger {
+    background: #e8374a;
+}
+.card-sub .dot-info {
+    background: #38bdf8;
+}
 
 /* ─── EMPTY STATE ─── */
 .empty-state {
@@ -200,12 +209,13 @@
 <!-- ═══ PAGE HEADER ═══ -->
 <div class="dash-header">
     <div class="dash-header-left">
-        <h1>Hola, <span>{{ session.full_name.split()[0] }}</span> </h1>
+        <h1>Hola, <span>{{ session.full_name.split()[0] }}</span></h1>
         <p>Panel principal · MiniMarket QuickStore</p>
         <div class="role-badge">
             <i class="fas fa-shield-alt"></i> {{ session.rol }}
         </div>
     </div>
+
     <div class="dash-header-right">
         <div class="dash-date">
             <i class="far fa-calendar-alt"></i>
@@ -223,7 +233,11 @@
     permissions_dashboard.can_view_providers or
     permissions_dashboard.can_view_sales or
     permissions_dashboard.can_view_cash or
-    permissions_dashboard.can_view_warehouses
+    permissions_dashboard.can_view_payment_methods or
+    permissions_dashboard.can_view_warehouses or
+    permissions_dashboard.can_view_purchases or
+    permissions_dashboard.can_view_inventory or
+    permissions_dashboard.can_view_output_notes
 %}
 
 {% if has_any %}
@@ -235,6 +249,7 @@
    or permissions_dashboard.can_view_permissions %}
 
 <div class="section-label">Equipo &amp; Acceso</div>
+
 <div class="stat-grid">
 
     {% if permissions_dashboard.can_view_users %}
@@ -244,7 +259,7 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Usuarios activos</div>
-        <div class="card-value">{{ stats.users }}</div>
+        <div class="card-value">{{ stats.users or 0 }}</div>
     </a>
     {% endif %}
 
@@ -255,7 +270,7 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Clientes registrados</div>
-        <div class="card-value">{{ stats.clients }}</div>
+        <div class="card-value">{{ stats.clients or 0 }}</div>
     </a>
     {% endif %}
 
@@ -266,7 +281,7 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Registros hoy</div>
-        <div class="card-value">{{ stats.today_attendance }}</div>
+        <div class="card-value">{{ stats.today_attendance or 0 }}</div>
         <div class="card-sub"><span class="dot"></span> Bitácora</div>
     </a>
     {% endif %}
@@ -278,19 +293,23 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Módulos / Permisos</div>
-        <div class="card-value">{{ stats.permissions }}</div>
+        <div class="card-value">{{ stats.permissions or 0 }}</div>
     </a>
     {% endif %}
 
 </div>
 {% endif %}
 
-<!-- ─── INVENTARIO ─── -->
+<!-- ─── INVENTARIO Y LOGÍSTICA ─── -->
 {% if permissions_dashboard.can_view_products
    or permissions_dashboard.can_view_providers
-   or permissions_dashboard.can_view_warehouses %}
+   or permissions_dashboard.can_view_warehouses
+   or permissions_dashboard.can_view_purchases
+   or permissions_dashboard.can_view_inventory
+   or permissions_dashboard.can_view_output_notes %}
 
 <div class="section-label">Inventario &amp; Logística</div>
+
 <div class="stat-grid">
 
     {% if permissions_dashboard.can_view_products %}
@@ -300,7 +319,7 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Productos</div>
-        <div class="card-value">{{ stats.products }}</div>
+        <div class="card-value">{{ stats.products or 0 }}</div>
     </a>
     {% endif %}
 
@@ -311,7 +330,7 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Proveedores</div>
-        <div class="card-value">{{ stats.providers }}</div>
+        <div class="card-value">{{ stats.providers or 0 }}</div>
     </a>
     {% endif %}
 
@@ -322,7 +341,48 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Almacenes</div>
-        <div class="card-value">{{ stats.warehouses }}</div>
+        <div class="card-value">{{ stats.warehouses or 0 }}</div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.can_view_inventory %}
+    <a class="stat-card" style="--card-accent:#facc15" href="{{ url_for('inventory.list_inventory') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-boxes-stacked"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Inventario activo</div>
+        <div class="card-value">{{ stats.inventory_items or 0 }}</div>
+        <div class="card-sub">
+            <span class="dot dot-warning"></span>
+            {{ stats.low_stock or 0 }} alertas de stock
+        </div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.can_view_purchases %}
+    <a class="stat-card" style="--card-accent:#22c55e" href="{{ url_for('purchases.list_purchases') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-cart-plus"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Compras registradas</div>
+        <div class="card-value">{{ stats.purchases or 0 }}</div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.can_view_output_notes %}
+    <a class="stat-card" style="--card-accent:#e8374a" href="{{ url_for('output_notes.list_output_notes') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-file-export"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Notas de salida activas</div>
+        <div class="card-value">{{ stats.output_notes or 0 }}</div>
+        <div class="card-sub">
+            <span class="dot dot-danger"></span>
+            Salidas administrativas
+        </div>
     </a>
     {% endif %}
 
@@ -330,9 +390,12 @@
 {% endif %}
 
 <!-- ─── FINANZAS ─── -->
-{% if permissions_dashboard.can_view_sales or permissions_dashboard.can_view_cash %}
+{% if permissions_dashboard.can_view_sales
+   or permissions_dashboard.can_view_cash
+   or permissions_dashboard.can_view_payment_methods %}
 
 <div class="section-label">Finanzas &amp; Ventas</div>
+
 <div class="stat-grid">
 
     {% if permissions_dashboard.can_view_sales %}
@@ -342,7 +405,7 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Ventas totales</div>
-        <div class="card-value">{{ stats.sales }}</div>
+        <div class="card-value">{{ stats.sales or 0 }}</div>
     </a>
     {% endif %}
 
@@ -353,8 +416,26 @@
             <i class="fas fa-arrow-up-right card-arrow"></i>
         </div>
         <div class="card-label">Cajas registradas</div>
-        <div class="card-value">{{ stats.cash }}</div>
-        <div class="card-sub"><span class="dot"></span> {{ stats.cash_open }} abiertas ahora</div>
+        <div class="card-value">{{ stats.cash or 0 }}</div>
+        <div class="card-sub">
+            <span class="dot"></span>
+            {{ stats.cash_open or 0 }} abiertas ahora
+        </div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.can_view_payment_methods %}
+    <a class="stat-card" style="--card-accent:#38bdf8" href="{{ url_for('payment_methods.list_payment_methods') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-credit-card"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Métodos de pago activos</div>
+        <div class="card-value">{{ stats.payment_methods or 0 }}</div>
+        <div class="card-sub">
+            <span class="dot dot-info"></span>
+            {{ stats.payment_methods_inactive or 0 }} inactivos
+        </div>
     </a>
     {% endif %}
 
@@ -377,6 +458,7 @@
     const d = new Date();
     const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
     const str = d.toLocaleDateString('es-ES', opts);
+
     document.getElementById('dashDate').textContent =
         str.charAt(0).toUpperCase() + str.slice(1);
 })();

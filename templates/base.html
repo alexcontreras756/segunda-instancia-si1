@@ -32,7 +32,11 @@
         }
 
         /* ─── RESET / BASE ─── */
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
             font-family: var(--font-body);
@@ -42,28 +46,35 @@
             overflow-x: hidden;
         }
 
-        /* subtle grain overlay */
         body::before {
             content: '';
-            position: fixed; inset: 0;
+            position: fixed;
+            inset: 0;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-            pointer-events: none; z-index: 0;
+            pointer-events: none;
+            z-index: 0;
         }
 
         /* ─── TOP NAV ─── */
         .qs-nav {
-            position: fixed; top: 0; left: 0; right: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             height: var(--nav-h);
             background: var(--c-nav);
             border-bottom: 1px solid var(--c-border);
-            display: flex; align-items: center;
+            display: flex;
+            align-items: center;
             padding: 0 1.5rem;
             z-index: 1000;
             gap: 1rem;
         }
 
         .qs-brand {
-            display: flex; align-items: center; gap: .55rem;
+            display: flex;
+            align-items: center;
+            gap: .55rem;
             text-decoration: none;
             font-family: var(--font-head);
             font-weight: 800;
@@ -75,27 +86,34 @@
         }
 
         .qs-brand-icon {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             background: var(--c-accent);
             border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #000;
             font-size: .9rem;
         }
 
-        .qs-brand span.accent { color: var(--c-accent); }
+        .qs-brand span.accent {
+            color: var(--c-accent);
+        }
 
         .qs-divider-v {
-            width: 1px; height: 28px;
+            width: 1px;
+            height: 28px;
             background: var(--c-border);
             flex-shrink: 0;
         }
 
-        /* top-nav search */
         .qs-search {
-            flex: 1; max-width: 340px;
+            flex: 1;
+            max-width: 340px;
             position: relative;
         }
+
         .qs-search input {
             width: 100%;
             background: var(--c-surface);
@@ -108,37 +126,58 @@
             outline: none;
             transition: border-color .2s;
         }
-        .qs-search input::placeholder { color: var(--c-muted); }
-        .qs-search input:focus { border-color: var(--c-accent); }
+
+        .qs-search input::placeholder {
+            color: var(--c-muted);
+        }
+
+        .qs-search input:focus {
+            border-color: var(--c-accent);
+        }
+
         .qs-search .search-icon {
-            position: absolute; left: .75rem; top: 50%;
+            position: absolute;
+            left: .75rem;
+            top: 50%;
             transform: translateY(-50%);
-            color: var(--c-muted); font-size: .8rem; pointer-events: none;
+            color: var(--c-muted);
+            font-size: .8rem;
+            pointer-events: none;
         }
 
         .qs-nav-right {
             margin-left: auto;
-            display: flex; align-items: center; gap: .75rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
         }
 
-        /* nav icon button */
         .qs-icon-btn {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
             background: var(--c-surface);
             border: 1px solid var(--c-border);
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: var(--c-muted);
             cursor: pointer;
             transition: background .2s, color .2s, border-color .2s;
             text-decoration: none;
             font-size: .85rem;
         }
-        .qs-icon-btn:hover { background: var(--c-card); color: var(--c-text); border-color: var(--c-accent); }
 
-        /* user chip */
+        .qs-icon-btn:hover {
+            background: var(--c-card);
+            color: var(--c-text);
+            border-color: var(--c-accent);
+        }
+
         .qs-user-chip {
-            display: flex; align-items: center; gap: .5rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
             background: var(--c-surface);
             border: 1px solid var(--c-border);
             border-radius: 40px;
@@ -147,28 +186,47 @@
             transition: border-color .2s;
             position: relative;
         }
-        .qs-user-chip:hover { border-color: var(--c-accent); }
+
+        .qs-user-chip:hover {
+            border-color: var(--c-accent);
+        }
+
         .qs-avatar {
-            width: 28px; height: 28px;
+            width: 28px;
+            height: 28px;
             background: linear-gradient(135deg, var(--c-accent), var(--c-accent2));
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: .75rem; font-weight: 700; color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .75rem;
+            font-weight: 700;
+            color: #000;
         }
+
         .qs-user-name {
-            font-size: .82rem; font-weight: 500;
+            font-size: .82rem;
+            font-weight: 500;
             color: var(--c-text);
             line-height: 1;
         }
-        .qs-user-role {
-            font-size: .7rem; color: var(--c-muted);
-            line-height: 1; margin-top: 1px;
-        }
-        .qs-user-caret { color: var(--c-muted); font-size: .65rem; }
 
-        /* dropdown */
+        .qs-user-role {
+            font-size: .7rem;
+            color: var(--c-muted);
+            line-height: 1;
+            margin-top: 1px;
+        }
+
+        .qs-user-caret {
+            color: var(--c-muted);
+            font-size: .65rem;
+        }
+
         .qs-dropdown {
-            position: absolute; top: calc(100% + 8px); right: 0;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
             background: var(--c-card);
             border: 1px solid var(--c-border);
             border-radius: var(--radius);
@@ -178,34 +236,65 @@
             z-index: 2000;
             overflow: hidden;
         }
+
         .qs-user-chip:focus-within .qs-dropdown,
-        .qs-user-chip.open .qs-dropdown { display: block; }
+        .qs-user-chip.open .qs-dropdown {
+            display: block;
+        }
+
         .qs-dropdown a {
-            display: flex; align-items: center; gap: .65rem;
+            display: flex;
+            align-items: center;
+            gap: .65rem;
             padding: .65rem 1rem;
-            color: var(--c-text); text-decoration: none;
+            color: var(--c-text);
+            text-decoration: none;
             font-size: .85rem;
             transition: background .15s;
         }
-        .qs-dropdown a:hover { background: var(--c-surface); }
-        .qs-dropdown .dd-danger { color: var(--c-accent2); }
-        .qs-dropdown hr { border-color: var(--c-border); margin: 0; }
+
+        .qs-dropdown a:hover {
+            background: var(--c-surface);
+        }
+
+        .qs-dropdown .dd-danger {
+            color: var(--c-accent2);
+        }
+
+        .qs-dropdown hr {
+            border-color: var(--c-border);
+            margin: 0;
+        }
 
         /* ─── SIDEBAR ─── */
         .qs-sidebar {
             position: fixed;
-            top: var(--nav-h); left: 0; bottom: 0;
+            top: var(--nav-h);
+            left: 0;
+            bottom: 0;
             width: var(--sidebar-w);
             background: var(--c-surface);
             border-right: 1px solid var(--c-border);
-            overflow-y: auto; overflow-x: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             z-index: 900;
             padding: 1.25rem 0 2rem;
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
         }
-        .qs-sidebar::-webkit-scrollbar { width: 4px; }
-        .qs-sidebar::-webkit-scrollbar-track { background: transparent; }
-        .qs-sidebar::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 4px; }
+
+        .qs-sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .qs-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .qs-sidebar::-webkit-scrollbar-thumb {
+            background: var(--c-border);
+            border-radius: 4px;
+        }
 
         .sidebar-section-label {
             font-family: var(--font-head);
@@ -218,7 +307,9 @@
         }
 
         .sidebar-link {
-            display: flex; align-items: center; gap: .75rem;
+            display: flex;
+            align-items: center;
+            gap: .75rem;
             padding: .62rem 1.25rem;
             color: var(--c-muted);
             text-decoration: none;
@@ -228,26 +319,32 @@
             transition: color .18s, background .18s, border-color .18s;
             position: relative;
         }
+
         .sidebar-link:hover {
             color: var(--c-text);
             background: rgba(245,166,35,.06);
         }
+
         .sidebar-link.active {
             color: var(--c-accent);
             background: rgba(245,166,35,.1);
             border-left-color: var(--c-accent);
             font-weight: 500;
         }
+
         .sidebar-link .s-icon {
-            width: 20px; text-align: center; font-size: .85rem; flex-shrink: 0;
+            width: 20px;
+            text-align: center;
+            font-size: .85rem;
+            flex-shrink: 0;
         }
 
-        /* badge pill */
         .sidebar-badge {
             margin-left: auto;
             background: var(--c-accent);
             color: #000;
-            font-size: .62rem; font-weight: 700;
+            font-size: .62rem;
+            font-weight: 700;
             padding: .1rem .45rem;
             border-radius: 20px;
             font-family: var(--font-head);
@@ -259,11 +356,15 @@
             margin-top: var(--nav-h);
             padding: 2rem 2.25rem;
             min-height: calc(100vh - var(--nav-h));
-            position: relative; z-index: 1;
+            position: relative;
+            z-index: 1;
         }
 
         /* ─── FLASH MESSAGES ─── */
-        .qs-alerts { margin-bottom: 1.5rem; }
+        .qs-alerts {
+            margin-bottom: 1.5rem;
+        }
+
         .alert {
             background: var(--c-card);
             border: 1px solid var(--c-border);
@@ -272,45 +373,87 @@
             font-size: .875rem;
             padding: .85rem 1.1rem;
         }
-        .alert-success { border-left: 4px solid var(--c-green); }
-        .alert-danger  { border-left: 4px solid var(--c-accent2); }
-        .alert-warning { border-left: 4px solid var(--c-accent); }
-        .alert-info    { border-left: 4px solid #58a6ff; }
-        .btn-close { filter: invert(1) opacity(.5); }
+
+        .alert-success {
+            border-left: 4px solid var(--c-green);
+        }
+
+        .alert-danger {
+            border-left: 4px solid var(--c-accent2);
+        }
+
+        .alert-warning {
+            border-left: 4px solid var(--c-accent);
+        }
+
+        .alert-info {
+            border-left: 4px solid #58a6ff;
+        }
+
+        .btn-close {
+            filter: invert(1) opacity(.5);
+        }
 
         /* ─── MOBILE TOGGLE ─── */
         .qs-mobile-toggle {
             display: none;
-            background: none; border: none;
-            color: var(--c-text); font-size: 1.1rem;
-            cursor: pointer; padding: .25rem;
+            background: none;
+            border: none;
+            color: var(--c-text);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: .25rem;
         }
 
         @media (max-width: 991px) {
-            .qs-mobile-toggle { display: flex; align-items: center; }
+            .qs-mobile-toggle {
+                display: flex;
+                align-items: center;
+            }
+
             .qs-sidebar {
                 transform: translateX(-100%);
                 transition: transform .25s ease;
             }
-            .qs-sidebar.open { transform: translateX(0); }
+
+            .qs-sidebar.open {
+                transform: translateX(0);
+            }
+
             .qs-main {
                 margin-left: 0;
                 padding: 1.25rem 1rem;
             }
-            .qs-search { display: none; }
+
+            .qs-search {
+                display: none;
+            }
+
             .sidebar-overlay {
                 display: none;
-                position: fixed; inset: 0;
+                position: fixed;
+                inset: 0;
                 background: rgba(0,0,0,.55);
                 z-index: 850;
             }
-            .sidebar-overlay.open { display: block; }
+
+            .sidebar-overlay.open {
+                display: block;
+            }
         }
 
         /* ─── UTILITY ─── */
-        .text-accent  { color: var(--c-accent) !important; }
-        .text-green   { color: var(--c-green) !important; }
-        .text-danger2 { color: var(--c-accent2) !important; }
+        .text-accent {
+            color: var(--c-accent) !important;
+        }
+
+        .text-green {
+            color: var(--c-green) !important;
+        }
+
+        .text-danger2 {
+            color: var(--c-accent2) !important;
+        }
     </style>
 </head>
 
@@ -340,8 +483,25 @@
         <a class="qs-icon-btn" href="{{ url_for('cash.list_cash') }}" title="Caja">
             <i class="fas fa-money-bill-wave"></i>
         </a>
-        <a class="qs-icon-btn" href="{{ url_for('sales.list_sales') }}" title="Nueva venta">
+
+        <a class="qs-icon-btn" href="{{ url_for('sales.list_sales') }}" title="Ventas">
             <i class="fas fa-cash-register"></i>
+        </a>
+
+        <a class="qs-icon-btn" href="{{ url_for('purchases.list_purchases') }}" title="Compras">
+            <i class="fas fa-cart-plus"></i>
+        </a>
+
+        <a class="qs-icon-btn" href="{{ url_for('inventory.list_inventory') }}" title="Inventario">
+            <i class="fas fa-boxes-stacked"></i>
+        </a>
+
+        <a class="qs-icon-btn" href="{{ url_for('output_notes.list_output_notes') }}" title="Nota de Salida">
+            <i class="fas fa-file-export"></i>
+        </a>
+
+        <a class="qs-icon-btn" href="{{ url_for('payment_methods.list_payment_methods') }}" title="Métodos de Pago">
+            <i class="fas fa-credit-card"></i>
         </a>
 
         <div class="qs-user-chip" id="userChip" tabindex="0">
@@ -353,9 +513,6 @@
             <i class="fas fa-chevron-down qs-user-caret ms-1"></i>
 
             <div class="qs-dropdown">
-                <a href="#"><i class="fas fa-user-circle"></i> Mi perfil</a>
-                <a href="#"><i class="fas fa-cog"></i> Configuración</a>
-                <hr>
                 <a href="{{ url_for('auth.logout') }}" class="dd-danger">
                     <i class="fas fa-sign-out-alt"></i> Cerrar sesión
                 </a>
@@ -375,6 +532,7 @@
     <a class="sidebar-link" href="{{ url_for('dashboard') }}">
         <span class="s-icon"><i class="fas fa-home"></i></span> Inicio
     </a>
+
     <a class="sidebar-link" href="{{ url_for('attendance.attendance_dashboard') }}">
         <span class="s-icon"><i class="fas fa-clock"></i></span> Bitácora
     </a>
@@ -384,15 +542,19 @@
     <a class="sidebar-link" href="{{ url_for('users.list_users') }}">
         <span class="s-icon"><i class="fas fa-users"></i></span> Usuarios
     </a>
+
     <a class="sidebar-link" href="{{ url_for('clients.list_clients') }}">
         <span class="s-icon"><i class="fas fa-user-friends"></i></span> Clientes
     </a>
+
     <a class="sidebar-link" href="{{ url_for('products.list_products') }}">
         <span class="s-icon"><i class="fas fa-box"></i></span> Productos
     </a>
+
     <a class="sidebar-link" href="{{ url_for('providers.list_providers') }}">
         <span class="s-icon"><i class="fas fa-truck"></i></span> Proveedores
     </a>
+
     <a class="sidebar-link" href="{{ url_for('permissions.list_permissions') }}">
         <span class="s-icon"><i class="fas fa-key"></i></span> Permisos
     </a>
@@ -402,9 +564,27 @@
     <a class="sidebar-link" href="{{ url_for('sales.list_sales') }}">
         <span class="s-icon"><i class="fas fa-cash-register"></i></span> Ventas
     </a>
+
+    <a class="sidebar-link" href="{{ url_for('purchases.list_purchases') }}">
+        <span class="s-icon"><i class="fas fa-cart-plus"></i></span> Compras
+    </a>
+
     <a class="sidebar-link" href="{{ url_for('cash.list_cash') }}">
         <span class="s-icon"><i class="fas fa-money-bill-wave"></i></span> Caja
     </a>
+
+    <a class="sidebar-link" href="{{ url_for('payment_methods.list_payment_methods') }}">
+        <span class="s-icon"><i class="fas fa-credit-card"></i></span> Métodos de Pago
+    </a>
+
+    <a class="sidebar-link" href="{{ url_for('inventory.list_inventory') }}">
+        <span class="s-icon"><i class="fas fa-boxes-stacked"></i></span> Inventario
+    </a>
+
+    <a class="sidebar-link" href="{{ url_for('output_notes.list_output_notes') }}">
+        <span class="s-icon"><i class="fas fa-file-export"></i></span> Nota de Salida
+    </a>
+
     <a class="sidebar-link" href="{{ url_for('warehouses.list_warehouses') }}">
         <span class="s-icon"><i class="fas fa-warehouse"></i></span> Almacén
     </a>
@@ -435,6 +615,7 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 (function () {
     /* ── Sidebar toggle (mobile) ── */
@@ -442,25 +623,43 @@
     const overlay  = document.getElementById('sidebarOverlay');
     const toggler  = document.getElementById('sidebarToggle');
 
-    function openSidebar()  { sidebar.classList.add('open');  overlay.classList.add('open');  }
-    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+    function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+    }
 
     toggler?.addEventListener('click', () =>
-        sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+        sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
+    );
+
     overlay?.addEventListener('click', closeSidebar);
 
     /* ── User dropdown ── */
     const chip = document.getElementById('userChip');
+
     chip?.addEventListener('click', () => chip.classList.toggle('open'));
+
     document.addEventListener('click', e => {
-        if (chip && !chip.contains(e.target)) chip.classList.remove('open');
+        if (chip && !chip.contains(e.target)) {
+            chip.classList.remove('open');
+        }
     });
 
     /* ── Active sidebar link ── */
     const links = document.querySelectorAll('.sidebar-link');
+
     links.forEach(link => {
-        if (link.href === window.location.href ||
-            window.location.pathname.startsWith(new URL(link.href).pathname)) {
+        const linkPath = new URL(link.href).pathname;
+
+        if (
+            link.href === window.location.href ||
+            window.location.pathname.startsWith(linkPath)
+        ) {
             link.classList.add('active');
         }
     });

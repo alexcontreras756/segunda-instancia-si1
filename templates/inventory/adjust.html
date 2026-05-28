@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Ajustar Inventario{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-sliders"></i> Ajustar Inventario</h1>
+    <p>Registra una entrada o salida manual de inventario.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+
+        <div class="card system-card">
+            <div class="card-header bg-warning">
+                <h5><i class="fas fa-boxes-stacked"></i> Datos del ajuste</h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="alert alert-info">
+                    <strong>Importante:</strong>
+                    este ajuste afecta directamente el stock del producto y la capacidad actual del almacén.
+                    También se registrará automáticamente en la bitácora.
+                </div>
+
+                <form method="POST">
+
+                    <div class="mb-3">
+                        <label for="codigo_almacen" class="form-label">Almacén *</label>
+                        <select class="form-select" id="codigo_almacen" name="codigo_almacen" required>
+                            <option value="">Seleccione almacén</option>
+
+                            {% for warehouse in warehouses %}
+                            <option value="{{ warehouse.codigo }}" {% if selected_warehouse == warehouse.codigo %}selected{% endif %}>
+                                {{ warehouse.nombre }} - {{ warehouse.codigo }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="codigo_producto" class="form-label">Producto *</label>
+                        <select class="form-select" id="codigo_producto" name="codigo_producto" required>
+                            <option value="">Seleccione producto</option>
+
+                            {% for product in products %}
+                            <option value="{{ product.codigo }}" {% if selected_product == product.codigo %}selected{% endif %}>
+                                {{ product.nombre }} - {{ product.codigo }} | Stock mínimo: {{ product.stock_minimo or 0 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="tipo_movimiento" class="form-label">Tipo de movimiento *</label>
+                        <select class="form-select" id="tipo_movimiento" name="tipo_movimiento" required>
+                            <option value="">Seleccione tipo</option>
+                            <option value="entrada">Entrada de inventario</option>
+                            <option value="salida">Salida de inventario</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cantidad" class="form-label">Cantidad *</label>
+                        <input
+                            type="number"
+                            min="1"
+                            class="form-control"
+                            id="cantidad"
+                            name="cantidad"
+                            required
+                            placeholder="Ej: 10"
+                        >
+                    </div>
+
+                    <div class="mb-3" id="fecha-vencimiento-wrapper">
+                        <label for="fecha_vencimiento" class="form-label">Fecha de vencimiento</label>
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="fecha_vencimiento"
+                            name="fecha_vencimiento"
+                        >
+                        <small class="text-muted">
+                            Se usa principalmente para entradas de inventario.
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="motivo" class="form-label">Motivo del ajuste</label>
+                        <textarea
+                            class="form-control"
+                            id="motivo"
+                            name="motivo"
+                            rows="3"
+                            placeholder="Ej: Corrección de conteo físico, producto dañado, reposición manual, etc."
+                        ></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save"></i> Registrar ajuste
+                    </button>
+
+                    <a href="{{ url_for('inventory.list_inventory') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tipoMovimiento = document.getElementById('tipo_movimiento');
+    const fechaWrapper = document.getElementById('fecha-vencimiento-wrapper');
+
+    function toggleFechaVencimiento() {
+        if (tipoMovimiento.value === 'salida') {
+            fechaWrapper.style.display = 'none';
+        } else {
+            fechaWrapper.style.display = 'block';
+        }
+    }
+
+    tipoMovimiento.addEventListener('change', toggleFechaVencimiento);
+    toggleFechaVencimiento();
+});
+</script>
+
+{% endblock %}

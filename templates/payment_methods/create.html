@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Método de Pago{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-plus-circle"></i> Nuevo Método de Pago</h1>
+    <p>Registra un nuevo método de pago para usarlo en ventas.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="card system-card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-credit-card"></i> Datos del método de pago</h5>
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST">
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre *</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nombre"
+                            name="nombre"
+                            required
+                            maxlength="50"
+                            placeholder="Ej: Efectivo, QR, Tarjeta, Transferencia"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea
+                            class="form-control"
+                            id="descripcion"
+                            name="descripcion"
+                            rows="3"
+                            maxlength="150"
+                            placeholder="Ej: Pago realizado mediante código QR"
+                        ></textarea>
+                        <small class="text-muted">
+                            Máximo 150 caracteres.
+                        </small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Nota:</strong>
+                        El método de pago se creará como activo y aparecerá automáticamente en Registrar Venta.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+
+                    <a href="{{ url_for('payment_methods.list_payment_methods') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

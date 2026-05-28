@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Compras{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-cart-plus"></i> Gestión de Compras</h1>
+    <p>Registro y consulta de compras realizadas a proveedores.</p>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="fas fa-list"></i> Compras registradas</h4>
+
+    <a href="{{ url_for('purchases.create_purchase') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nueva Compra
+    </a>
+</div>
+
+<div class="card system-card">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-receipt"></i> Lista de compras</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código</th>
+                        <th>Fecha</th>
+                        <th>Proveedor</th>
+                        <th>Almacén</th>
+                        <th>Usuario</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for purchase in purchases %}
+                    <tr>
+                        <td>
+                            <strong>{{ purchase.codigo }}</strong>
+                        </td>
+
+                        <td>
+                            {{ purchase.fecha_hora.strftime('%d/%m/%Y %H:%M') }}
+                        </td>
+
+                        <td>
+                            {{ purchase.proveedor }}
+                            <br>
+                            <small class="text-muted">{{ purchase.codigo_proveedor }}</small>
+                        </td>
+
+                        <td>
+                            {{ purchase.almacen }}
+                            <br>
+                            <small class="text-muted">{{ purchase.codigo_almacen }}</small>
+                        </td>
+
+                        <td>
+                            {{ purchase.usuario }}
+                            <br>
+                            <small class="text-muted">{{ purchase.codigo_usuario }}</small>
+                        </td>
+
+                        <td>
+                            <strong>Bs {{ "%.2f"|format((purchase.monto_total or 0)|float) }}</strong>
+                        </td>
+
+                        <td>
+                            {% if purchase.estado %}
+                                <span class="badge bg-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-danger">Anulada</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('purchases.detail_purchase', codigo=purchase.codigo) }}"
+                               class="btn btn-sm btn-info">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">
+                            No hay compras registradas.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
