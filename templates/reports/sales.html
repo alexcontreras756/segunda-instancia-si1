@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Ventas{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-chart-line"></i> Reporte de Ventas</h1>
+    <p>Consulta ventas por fecha, usuario, tipo de pago, estado y campos seleccionados.</p>
+</div>
+
+<div class="card system-card mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-filter"></i> Filtros del reporte</h5>
+    </div>
+
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('reports.sales_report') }}">
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <label for="fecha_inicio" class="form-label">Fecha inicio</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="fecha_inicio"
+                        name="fecha_inicio"
+                        value="{{ filters.fecha_inicio or '' }}"
+                    >
+                </div>
+
+                <div class="col-md-3">
+                    <label for="fecha_fin" class="form-label">Fecha fin</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="fecha_fin"
+                        name="fecha_fin"
+                        value="{{ filters.fecha_fin or '' }}"
+                    >
+                </div>
+
+                <div class="col-md-3">
+                    <label for="codigo_usuario" class="form-label">Usuario / Cajero</label>
+                    <select class="form-select" id="codigo_usuario" name="codigo_usuario">
+                        <option value="">Todos los usuarios</option>
+
+                        {% for user in users %}
+                        <option value="{{ user.codigo }}"
+                            {% if filters.codigo_usuario == user.codigo %}selected{% endif %}>
+                            {{ user.nombre }} - {{ user.codigo }} ({{ user.rol }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="id_tipo_pago" class="form-label">Tipo de pago</label>
+                    <select class="form-select" id="id_tipo_pago" name="id_tipo_pago">
+                        <option value="">Todos los tipos</option>
+
+                        {% for type in payment_types %}
+                        <option value="{{ type.id }}"
+                            {% if filters.id_tipo_pago == type.id|string %}selected{% endif %}>
+                            {{ type.nombre }}
+                            {% if not type.activo %}(Inactivo){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="estado" class="form-label">Estado</label>
+                    <select class="form-select" id="estado" name="estado">
+                        <option value="todos" {% if filters.estado == 'todos' %}selected{% endif %}>
+                            Todas
+                        </option>
+                        <option value="activa" {% if filters.estado == 'activa' %}selected{% endif %}>
+                            Activas
+                        </option>
+                        <option value="anulada" {% if filters.estado == 'anulada' %}selected{% endif %}>
+                            Anuladas
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-9">
+                    <label for="search" class="form-label">Buscar</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="search"
+                        name="search"
+                        value="{{ filters.search or '' }}"
+                        placeholder="Buscar por factura, cliente, CI, usuario o tipo de pago"
+                    >
+                </div>
+
+            </div>
+
+            <hr>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="fas fa-table-columns"></i> Campos a mostrar
+                </label>
+
+                <div class="row">
+                    {% for field, label in available_fields.items() %}
+                    <div class="col-md-3 col-sm-6 mb-2">
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                name="fields"
+                                value="{{ field }}"
+                                id="field_{{ field }}"
+                                {% if field in selected_fields %}checked{% endif %}
+                            >
+
+                            <label class="form-check-label" for="field_{{ field }}">
+                                {{ label }}
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Generar reporte
+                </button>
+
+                <a href="{{ url_for('reports.sales_report') }}" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> Limpiar filtros
+                </a>
+
+                <a href="{{ url_for('reports.sales_report_pdf') }}?{{ pdf_query }}" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-3 mb-3">
+        <div class="card system-card bg-primary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-receipt"></i> Registros</h5>
+                <h2>{{ summary.total_registros }}</h2>
+                <p class="mb-0">Ventas encontradas</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card system-card bg-success text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-check-circle"></i> Activas</h5>
+                <h2>{{ summary.ventas_activas }}</h2>
+                <p class="mb-0">Ventas válidas</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card system-card bg-secondary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-ban"></i> Anuladas</h5>
+                <h2>{{ summary.ventas_anuladas }}</h2>
+                <p class="mb-0">Ventas canceladas</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card system-card bg-warning text-dark">
+            <div class="card-body">
+                <h5><i class="fas fa-coins"></i> Total activo</h5>
+                <h2>Bs {{ "%.2f"|format((summary.total_activo or 0)|float) }}</h2>
+                <p class="mb-0">Solo ventas activas</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-6 mb-3">
+        <div class="card system-card">
+            <div class="card-header bg-dark text-white">
+                <h5><i class="fas fa-user"></i> Resumen por usuario</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in summary.resumen_usuarios %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.usuario }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ item.codigo_usuario }}</small>
+                                </td>
+
+                                <td>{{ item.cantidad }}</td>
+
+                                <td>
+                                    <strong>Bs {{ "%.2f"|format((item.total or 0)|float) }}</strong>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    No hay datos para resumir.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card system-card">
+            <div class="card-header bg-dark text-white">
+                <h5><i class="fas fa-credit-card"></i> Resumen por tipo de pago</h5>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Tipo de pago</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in summary.resumen_tipos_pago %}
+                            <tr>
+                                <td><strong>{{ item.tipo_pago }}</strong></td>
+
+                                <td>{{ item.cantidad }}</td>
+
+                                <td>
+                                    <strong>Bs {{ "%.2f"|format((item.total or 0)|float) }}</strong>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    No hay datos para resumir.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card system-card">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5 class="mb-0">
+            <i class="fas fa-table"></i> Resultado del reporte
+        </h5>
+
+        <span class="badge bg-primary">
+            {{ summary.total_registros }} registros
+        </span>
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        {% for field in selected_fields %}
+                        <th>{{ available_fields[field] }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        {% for field in selected_fields %}
+                        <td>
+                            {% if field == 'estado' %}
+                                {% if row[field] %}
+                                    <span class="badge bg-success">Activa</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Anulada</span>
+                                {% endif %}
+
+                            {% elif field == 'pagado' %}
+                                {% if row[field] %}
+                                    <span class="badge bg-success">Sí</span>
+                                {% else %}
+                                    <span class="badge bg-danger">No</span>
+                                {% endif %}
+
+                            {% elif field in ['monto_total', 'monto_final'] %}
+                                <strong>{{ format_value(row[field], field) }}</strong>
+
+                            {% else %}
+                                {{ format_value(row[field], field) }}
+                            {% endif %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="{{ selected_fields|length }}" class="text-center text-muted">
+                            No se encontraron ventas con los filtros seleccionados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="{{ selected_fields|length }}">
+                            Total ventas activas:
+                            Bs {{ "%.2f"|format((summary.total_activo or 0)|float) }}
+                            |
+                            Total general:
+                            Bs {{ "%.2f"|format((summary.total_general or 0)|float) }}
+                        </th>
+                    </tr>
+                </tfoot>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -504,6 +504,10 @@
             <i class="fas fa-credit-card"></i>
         </a>
 
+        <a class="qs-icon-btn" href="{{ url_for('reports.sales_report') }}" title="Reportes">
+            <i class="fas fa-chart-line"></i>
+        </a>
+
         <div class="qs-user-chip" id="userChip" tabindex="0">
             <div class="qs-avatar">{{ session.full_name[0] | upper }}</div>
             <div>
@@ -587,6 +591,10 @@
 
     <a class="sidebar-link" href="{{ url_for('warehouses.list_warehouses') }}">
         <span class="s-icon"><i class="fas fa-warehouse"></i></span> Almacén
+    </a>
+
+    <a class="sidebar-link" href="{{ url_for('reports.sales_report') }}">
+        <span class="s-icon"><i class="fas fa-chart-line"></i></span> Reportes
     </a>
 
 </aside>

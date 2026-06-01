@@ -31,6 +31,7 @@ from controllers.purchase_controller import purchase_bp
 from controllers.inventory_controller import inventory_bp
 from controllers.output_note_controller import output_note_bp
 from controllers.payment_method_controller import payment_method_bp
+from controllers.report_controller import report_bp
 
 
 app = Flask(__name__)
@@ -76,6 +77,7 @@ app.register_blueprint(purchase_bp)
 app.register_blueprint(inventory_bp)
 app.register_blueprint(output_note_bp)
 app.register_blueprint(payment_method_bp)
+app.register_blueprint(report_bp)
 
 
 # Rutas principales
@@ -115,6 +117,7 @@ def dashboard():
     can_view_inventory = Permission.has_permission(codigo_usuario, 'inventory_read')
     can_view_output_notes = Permission.has_permission(codigo_usuario, 'output_note_read')
     can_view_payment_methods = Permission.has_permission(codigo_usuario, 'payment_method_read')
+    can_view_reports = Permission.has_permission(codigo_usuario, 'report_sales_read')
 
     stats = {}
 
@@ -167,6 +170,9 @@ def dashboard():
         stats['payment_methods'] = PaymentMethod.count_all(active_only=True)
         stats['payment_methods_inactive'] = PaymentMethod.count_inactive()
 
+    if can_view_reports:
+        stats['reports'] = 1
+
     # Diccionario con permisos para mostrar los bloques correspondientes
     permissions_dashboard = {
         'can_view_users': can_view_users,
@@ -181,7 +187,8 @@ def dashboard():
         'can_view_purchases': can_view_purchases,
         'can_view_inventory': can_view_inventory,
         'can_view_output_notes': can_view_output_notes,
-        'can_view_payment_methods': can_view_payment_methods
+        'can_view_payment_methods': can_view_payment_methods,
+        'can_view_reports': can_view_reports
     }
 
     return render_template(
