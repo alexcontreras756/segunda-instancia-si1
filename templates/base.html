@@ -606,6 +606,10 @@
             <i class="fas fa-chart-line"></i>
         </a>
 
+        <a class="qs-icon-btn" href="{{ url_for('voice_ai.voice_ai_page') }}" title="Reporte de Voz IA">
+            <i class="fas fa-microphone-lines"></i>
+        </a>
+
         <div class="qs-user-chip" id="userChip" tabindex="0">
             <div class="qs-avatar">
                 {{ session.full_name[0] | upper if session.full_name else 'U' }}
@@ -709,6 +713,10 @@
 
     <a class="sidebar-link" href="{{ url_for('reports.profit_report') }}">
         <span class="s-icon"><i class="fas fa-chart-line"></i></span> Reporte de Utilidad
+    </a>
+
+    <a class="sidebar-link" href="{{ url_for('voice_ai.voice_ai_page') }}">
+        <span class="s-icon"><i class="fas fa-microphone-lines"></i></span> Reporte de Voz IA
     </a>
 
 </aside>

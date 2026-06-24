@@ -36,6 +36,7 @@ from controllers.payment_method_controller import payment_method_bp
 from controllers.discount_controller import discount_bp
 from controllers.promotion_controller import promotion_bp
 from controllers.report_controller import report_bp
+from controllers.voice_ai_controller import voice_ai_bp
 
 
 app = Flask(__name__)
@@ -84,6 +85,7 @@ app.register_blueprint(payment_method_bp)
 app.register_blueprint(discount_bp)
 app.register_blueprint(promotion_bp)
 app.register_blueprint(report_bp)
+app.register_blueprint(voice_ai_bp)
 
 
 # Rutas principales
@@ -130,8 +132,16 @@ def dashboard():
     can_view_sales_report = Permission.has_permission(codigo_usuario, 'report_sales_read')
     can_view_profit_report = Permission.has_permission(codigo_usuario, 'report_profit_read')
 
+    # Reporte de Voz IA usará el mismo permiso base de reportes de ventas
+    # para no crear permisos nuevos ni tocar la base de datos.
+    can_view_voice_ai_report = can_view_sales_report
+
     # Permiso general para mostrar el bloque de Reportes
-    can_view_reports = can_view_sales_report or can_view_profit_report
+    can_view_reports = (
+        can_view_sales_report
+        or can_view_profit_report
+        or can_view_voice_ai_report
+    )
 
     stats = {}
 
@@ -201,6 +211,9 @@ def dashboard():
         if can_view_profit_report:
             reports_count += 1
 
+        if can_view_voice_ai_report:
+            reports_count += 1
+
         stats['reports'] = reports_count
 
     # Diccionario con permisos para mostrar los bloques correspondientes
@@ -224,7 +237,8 @@ def dashboard():
         # Reportes
         'can_view_reports': can_view_reports,
         'can_view_sales_report': can_view_sales_report,
-        'can_view_profit_report': can_view_profit_report
+        'can_view_profit_report': can_view_profit_report,
+        'can_view_voice_ai_report': can_view_voice_ai_report
     }
 
     return render_template(

@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Voz IA{% endblock %}
+
+{% block content %}
+
+<style>
+.voice-ai-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+}
+
+.voice-ai-hero {
+    background:
+        radial-gradient(circle at top left, rgba(245, 166, 35, .22), transparent 32%),
+        linear-gradient(135deg, rgba(22, 27, 34, .98), rgba(28, 35, 48, .98));
+    border: 1px solid var(--c-border);
+    border-radius: 18px;
+    padding: 1.35rem;
+    box-shadow: var(--shadow);
+}
+
+.voice-ai-hero h1 {
+    font-family: var(--font-head);
+    font-weight: 800;
+    letter-spacing: -.03em;
+    margin: 0;
+    color: var(--c-text);
+}
+
+.voice-ai-hero h1 span {
+    color: var(--c-accent);
+}
+
+.voice-ai-hero p {
+    margin: .5rem 0 0;
+    color: var(--c-muted);
+}
+
+.voice-ai-card {
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.voice-ai-card-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--c-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+
+.voice-ai-card-header h5 {
+    margin: 0;
+    font-weight: 700;
+    color: var(--c-text);
+}
+
+.voice-ai-card-body {
+    padding: 1.25rem;
+}
+
+.voice-ai-question-box {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: .75rem;
+    align-items: start;
+}
+
+.voice-ai-question-box textarea {
+    min-height: 88px;
+    resize: vertical;
+    background: var(--c-surface);
+    color: var(--c-text);
+    border: 1px solid var(--c-border);
+    border-radius: 12px;
+}
+
+.voice-ai-question-box textarea:focus {
+    background: var(--c-surface);
+    color: var(--c-text);
+    border-color: var(--c-accent);
+    box-shadow: 0 0 0 .18rem rgba(245, 166, 35, .16);
+}
+
+.voice-ai-btn {
+    border-radius: 12px;
+    font-weight: 700;
+    min-height: 44px;
+    white-space: nowrap;
+}
+
+.voice-ai-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: 1rem;
+}
+
+.voice-ai-chip {
+    border: 1px solid var(--c-border);
+    background: var(--c-surface);
+    color: var(--c-text);
+    border-radius: 999px;
+    padding: .45rem .75rem;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.voice-ai-chip:hover {
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+}
+
+.voice-ai-answer {
+    background: rgba(13, 17, 23, .55);
+    border: 1px solid var(--c-border);
+    border-radius: 14px;
+    padding: 1rem;
+    white-space: pre-line;
+    min-height: 120px;
+    color: var(--c-text);
+}
+
+.voice-ai-status {
+    font-size: .9rem;
+    color: var(--c-muted);
+}
+
+.voice-ai-table {
+    color: var(--c-text);
+}
+
+.voice-ai-table thead {
+    background: var(--c-surface);
+}
+
+.voice-ai-table th,
+.voice-ai-table td {
+    border-color: var(--c-border);
+    vertical-align: middle;
+    font-size: .88rem;
+}
+
+.voice-ai-empty {
+    color: var(--c-muted);
+    text-align: center;
+    padding: 1.25rem;
+}
+
+@media (max-width: 768px) {
+    .voice-ai-question-box {
+        grid-template-columns: 1fr;
+    }
+
+    .voice-ai-btn {
+        width: 100%;
+    }
+
+    .voice-ai-card-header {
+        align-items: flex-start;
+    }
+}
+</style>
+
+<div class="voice-ai-wrapper">
+
+    <div class="voice-ai-hero">
+        <h1>
+            <i class="fas fa-microphone-lines"></i>
+            Reporte de Voz con <span>IA</span>
+        </h1>
+        <p>
+            Consulta por voz o texto datos reales del sistema: ventas, utilidad, caja, inventario,
+            compras, notas de salida y productos en alerta.
+        </p>
+    </div>
+
+    <div class="voice-ai-card">
+        <div class="voice-ai-card-header">
+            <h5>
+                <i class="fas fa-robot text-accent"></i>
+                Asistente inteligente de reportes
+            </h5>
+
+            <span class="voice-ai-status" id="voiceStatus">
+                Listo para consultar
+            </span>
+        </div>
+
+        <div class="voice-ai-card-body">
+
+            <div class="alert alert-info">
+                <i class="fas fa-circle-info me-2"></i>
+                Puedes hablar o escribir. Gemini redacta la respuesta, pero los datos salen de PostgreSQL.
+            </div>
+
+            <div class="voice-ai-question-box">
+                <textarea
+                    id="voiceQuestion"
+                    class="form-control"
+                    placeholder="Ej: Muéstrame los productos con stock mínimo"
+                ></textarea>
+
+                <button type="button" class="btn btn-warning voice-ai-btn" id="btnStartVoice">
+                    <i class="fas fa-microphone"></i> Hablar
+                </button>
+
+                <button type="button" class="btn btn-primary voice-ai-btn" id="btnAskAI">
+                    <i class="fas fa-paper-plane"></i> Consultar
+                </button>
+            </div>
+
+            <div class="voice-ai-suggestions">
+                <button type="button" class="voice-ai-chip" data-question="Muéstrame los productos con stock mínimo">
+                    Stock mínimo
+                </button>
+
+                <button type="button" class="voice-ai-chip" data-question="Muéstrame los productos agotados">
+                    Agotados
+                </button>
+
+                <button type="button" class="voice-ai-chip" data-question="Cuál es la utilidad de hoy">
+                    Utilidad de hoy
+                </button>
+
+                <button type="button" class="voice-ai-chip" data-question="Cuál es la utilidad del mes">
+                    Utilidad del mes
+                </button>
+
+                <button type="button" class="voice-ai-chip" data-question="Muéstrame las ventas de hoy">
+                    Ventas de hoy
+                </button>
+
+                <button type="button" class="voice-ai-chip" data-question="Dame un resumen de caja">
+                    Caja
+                </button>
+
+                <button type="button" class="voice-ai-chip" data-question="Dame un resumen general del minimarket">
+                    Resumen general
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="voice-ai-card">
+        <div class="voice-ai-card-header">
+            <h5>
+                <i class="fas fa-comment-dots text-green"></i>
+                Respuesta de la IA
+            </h5>
+
+            <button type="button" class="btn btn-sm btn-outline-warning" id="btnSpeakAnswer">
+                <i class="fas fa-volume-high"></i> Leer respuesta
+            </button>
+        </div>
+
+        <div class="voice-ai-card-body">
+            <div class="voice-ai-answer" id="voiceAnswer">
+                Todavía no se realizó ninguna consulta.
+            </div>
+        </div>
+    </div>
+
+    <div class="voice-ai-card">
+        <div class="voice-ai-card-header">
+            <h5>
+                <i class="fas fa-table text-accent"></i>
+                Datos encontrados
+            </h5>
+
+            <span class="voice-ai-status" id="tableStatus">
+                Sin datos cargados
+            </span>
+        </div>
+
+        <div class="voice-ai-card-body">
+            <div class="table-responsive">
+                <table class="table table-hover voice-ai-table" id="voiceResultTable">
+                    <thead id="voiceResultHead"></thead>
+                    <tbody id="voiceResultBody">
+                        <tr>
+                            <td class="voice-ai-empty">
+                                Realiza una consulta para ver resultados.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+(function () {
+    const voiceAIAskUrl = "{{ url_for('voice_ai.ask_voice_ai') }}";
+
+    const questionInput = document.getElementById('voiceQuestion');
+    const btnStartVoice = document.getElementById('btnStartVoice');
+    const btnAskAI = document.getElementById('btnAskAI');
+    const btnSpeakAnswer = document.getElementById('btnSpeakAnswer');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const tableStatus = document.getElementById('tableStatus');
+    const answerBox = document.getElementById('voiceAnswer');
+    const tableHead = document.getElementById('voiceResultHead');
+    const tableBody = document.getElementById('voiceResultBody');
+    const suggestionButtons = document.querySelectorAll('.voice-ai-chip');
+
+    let lastAnswer = '';
+    let recognition = null;
+
+    function setStatus(message) {
+        if (voiceStatus) {
+            voiceStatus.textContent = message;
+        }
+    }
+
+    function escapeHtml(value) {
+        if (value === null || value === undefined || value === '') {
+            return '-';
+        }
+
+        return String(value)
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function formatColumnName(column) {
+        return String(column)
+            .replaceAll('_', ' ')
+            .replace(/\b\w/g, function (letter) {
+                return letter.toUpperCase();
+            });
+    }
+
+    function setLoading(isLoading) {
+        if (btnAskAI) {
+            btnAskAI.disabled = isLoading;
+            btnAskAI.innerHTML = isLoading
+                ? '<i class="fas fa-spinner fa-spin"></i> Consultando...'
+                : '<i class="fas fa-paper-plane"></i> Consultar';
+        }
+
+        if (btnStartVoice) {
+            btnStartVoice.disabled = isLoading;
+        }
+    }
+
+    function renderTable(report) {
+        const rows = report && Array.isArray(report.rows) ? report.rows : [];
+        const columns = report && Array.isArray(report.columns) ? report.columns : [];
+
+        if (!tableHead || !tableBody) {
+            return;
+        }
+
+        tableHead.innerHTML = '';
+        tableBody.innerHTML = '';
+
+        if (!rows.length || !columns.length) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td class="voice-ai-empty">
+                        No se encontraron datos para esta consulta.
+                    </td>
+                </tr>
+            `;
+
+            if (tableStatus) {
+                tableStatus.textContent = '0 registros';
+            }
+
+            return;
+        }
+
+        const headRow = document.createElement('tr');
+
+        columns.forEach(function (column) {
+            const th = document.createElement('th');
+            th.textContent = formatColumnName(column);
+            headRow.appendChild(th);
+        });
+
+        tableHead.appendChild(headRow);
+
+        rows.forEach(function (row) {
+            const tr = document.createElement('tr');
+
+            columns.forEach(function (column) {
+                const td = document.createElement('td');
+                td.innerHTML = escapeHtml(row[column]);
+                tr.appendChild(td);
+            });
+
+            tableBody.appendChild(tr);
+        });
+
+        if (tableStatus) {
+            tableStatus.textContent = rows.length + ' registro(s)';
+        }
+    }
+
+    async function askAI() {
+        const question = questionInput.value.trim();
+
+        if (!question) {
+            answerBox.textContent = 'Primero escribe o dicta una pregunta.';
+            setStatus('Falta la pregunta');
+            return;
+        }
+
+        setLoading(true);
+        setStatus('Consultando datos reales del sistema...');
+        answerBox.textContent = 'Procesando consulta...';
+
+        try {
+            const response = await fetch(voiceAIAskUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    question: question
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                throw new Error(data.message || 'No se pudo procesar la consulta.');
+            }
+
+            lastAnswer = data.answer || '';
+            answerBox.textContent = lastAnswer || 'Consulta procesada sin respuesta textual.';
+
+            renderTable(data.report || {});
+            setStatus('Consulta finalizada correctamente');
+
+        } catch (error) {
+            lastAnswer = '';
+            answerBox.textContent = 'Error: ' + error.message;
+            renderTable({});
+            setStatus('Error en la consulta');
+
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function initSpeechRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            setStatus('Tu navegador no soporta reconocimiento de voz. Usa el cuadro de texto.');
+
+            if (btnStartVoice) {
+                btnStartVoice.disabled = true;
+                btnStartVoice.innerHTML = '<i class="fas fa-microphone-slash"></i> No disponible';
+            }
+
+            return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = 'es-BO';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = function () {
+            setStatus('Escuchando...');
+            btnStartVoice.innerHTML = '<i class="fas fa-microphone-lines"></i> Escuchando';
+        };
+
+        recognition.onresult = function (event) {
+            const transcript = event.results[0][0].transcript;
+            questionInput.value = transcript;
+            setStatus('Pregunta capturada. Puedes consultar.');
+        };
+
+        recognition.onerror = function () {
+            setStatus('No se pudo capturar la voz. Intenta otra vez o escribe.');
+        };
+
+        recognition.onend = function () {
+            btnStartVoice.innerHTML = '<i class="fas fa-microphone"></i> Hablar';
+        };
+    }
+
+    function speakAnswer() {
+        if (!lastAnswer) {
+            lastAnswer = answerBox.textContent || '';
+        }
+
+        if (!lastAnswer || lastAnswer.trim() === '' || lastAnswer.includes('Todavía no')) {
+            setStatus('No hay respuesta para leer.');
+            return;
+        }
+
+        if (!window.speechSynthesis) {
+            setStatus('Tu navegador no soporta lectura de voz.');
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(lastAnswer);
+        utterance.lang = 'es-BO';
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+
+        utterance.onend = function () {
+            setStatus('Lectura finalizada');
+        };
+
+        utterance.onerror = function () {
+            setStatus('No se pudo leer la respuesta.');
+        };
+
+        window.speechSynthesis.speak(utterance);
+        setStatus('Leyendo respuesta...');
+    }
+
+    suggestionButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            questionInput.value = button.dataset.question || '';
+            questionInput.focus();
+        });
+    });
+
+    if (btnAskAI) {
+        btnAskAI.addEventListener('click', askAI);
+    }
+
+    if (questionInput) {
+        questionInput.addEventListener('keydown', function (event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                askAI();
+            }
+        });
+    }
+
+    if (btnStartVoice) {
+        btnStartVoice.addEventListener('click', function () {
+            if (recognition) {
+                recognition.start();
+            }
+        });
+    }
+
+    if (btnSpeakAnswer) {
+        btnSpeakAnswer.addEventListener('click', speakAnswer);
+    }
+
+    initSpeechRecognition();
+})();
+</script>
+
+{% endblock %}
