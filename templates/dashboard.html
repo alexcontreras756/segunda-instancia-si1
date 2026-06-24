@@ -14,6 +14,7 @@
     gap: 1rem;
     margin-bottom: 2rem;
 }
+
 .dash-header-left h1 {
     font-family: var(--font-head);
     font-size: 1.75rem;
@@ -23,14 +24,21 @@
     line-height: 1.1;
     margin: 0;
 }
-.dash-header-left h1 span { color: var(--c-accent); }
+
+.dash-header-left h1 span {
+    color: var(--c-accent);
+}
+
 .dash-header-left p {
     margin: .35rem 0 0;
     color: var(--c-muted);
     font-size: .875rem;
 }
+
 .dash-header-left .role-badge {
-    display: inline-flex; align-items: center; gap: .4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
     background: rgba(245,166,35,.12);
     border: 1px solid rgba(245,166,35,.3);
     color: var(--c-accent);
@@ -43,12 +51,19 @@
     border-radius: 20px;
     margin-top: .5rem;
 }
+
 .dash-header-right {
-    display: flex; align-items: center; gap: .5rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
 }
+
 .dash-date {
-    font-size: .8rem; color: var(--c-muted);
-    display: flex; align-items: center; gap: .4rem;
+    font-size: .8rem;
+    color: var(--c-muted);
+    display: flex;
+    align-items: center;
+    gap: .4rem;
 }
 
 /* ─── SECTION LABEL ─── */
@@ -60,8 +75,11 @@
     text-transform: uppercase;
     color: var(--c-muted);
     margin-bottom: 1rem;
-    display: flex; align-items: center; gap: .6rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
 }
+
 .section-label::after {
     content: '';
     flex: 1;
@@ -82,22 +100,28 @@
     border: 1px solid var(--c-border);
     border-radius: var(--radius);
     padding: 1.35rem 1.35rem 1.1rem;
-    display: flex; flex-direction: column;
+    display: flex;
+    flex-direction: column;
     gap: .5rem;
     text-decoration: none;
     position: relative;
     overflow: hidden;
     transition: transform .2s, border-color .2s, box-shadow .2s;
     cursor: pointer;
+    min-height: 150px;
 }
+
 .stat-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 3px;
     background: var(--card-accent, var(--c-accent));
     border-radius: var(--radius) var(--radius) 0 0;
 }
+
 .stat-card:hover {
     transform: translateY(-3px);
     border-color: var(--card-accent, var(--c-accent));
@@ -105,12 +129,13 @@
     text-decoration: none;
 }
 
-/* glow blob */
 .stat-card::after {
     content: '';
     position: absolute;
-    bottom: -30px; right: -20px;
-    width: 100px; height: 100px;
+    bottom: -30px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
     background: var(--card-accent, var(--c-accent));
     opacity: .06;
     border-radius: 50%;
@@ -118,21 +143,29 @@
 }
 
 .card-icon-row {
-    display: flex; align-items: center; justify-content: space-between;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
+
 .card-icon {
-    width: 38px; height: 38px;
+    width: 38px;
+    height: 38px;
     background: rgba(255,255,255,.05);
     border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: .95rem;
     color: var(--card-accent, var(--c-accent));
 }
+
 .card-arrow {
     font-size: .7rem;
     color: var(--c-muted);
     transition: color .2s, transform .2s;
 }
+
 .stat-card:hover .card-arrow {
     color: var(--card-accent, var(--c-accent));
     transform: translate(2px, -2px);
@@ -142,8 +175,9 @@
     font-size: .78rem;
     color: var(--c-muted);
     font-weight: 400;
-    line-height: 1;
+    line-height: 1.25;
 }
+
 .card-value {
     font-family: var(--font-head);
     font-size: 2rem;
@@ -152,23 +186,32 @@
     line-height: 1;
     letter-spacing: -.04em;
 }
+
 .card-sub {
     font-size: .75rem;
     color: var(--c-muted);
-    display: flex; align-items: center; gap: .3rem;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    flex-wrap: wrap;
 }
+
 .card-sub .dot {
-    width: 6px; height: 6px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: var(--c-green);
     flex-shrink: 0;
 }
+
 .card-sub .dot-warning {
     background: #facc15;
 }
+
 .card-sub .dot-danger {
     background: #e8374a;
 }
+
 .card-sub .dot-info {
     background: #38bdf8;
 }
@@ -182,15 +225,20 @@
     text-align: center;
     margin-top: .5rem;
 }
+
 .empty-state-icon {
-    width: 64px; height: 64px;
+    width: 64px;
+    height: 64px;
     background: rgba(255,255,255,.04);
     border-radius: 16px;
-    display: inline-flex; align-items: center; justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     font-size: 1.5rem;
     color: var(--c-muted);
     margin-bottom: 1rem;
 }
+
 .empty-state h4 {
     font-family: var(--font-head);
     font-size: 1.05rem;
@@ -198,18 +246,126 @@
     color: var(--c-text);
     margin-bottom: .4rem;
 }
+
 .empty-state p {
     color: var(--c-muted);
     font-size: .875rem;
     max-width: 340px;
     margin: 0 auto;
 }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1199px) {
+    .stat-grid {
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    }
+}
+
+@media (max-width: 991px) {
+    .dash-header {
+        align-items: flex-start;
+    }
+
+    .dash-header-left h1 {
+        font-size: 1.55rem;
+    }
+
+    .stat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .85rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        padding: 1.15rem;
+        min-height: 140px;
+    }
+
+    .card-value {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 575px) {
+    .dash-header {
+        margin-bottom: 1.4rem;
+    }
+
+    .dash-header-left h1 {
+        font-size: 1.35rem;
+    }
+
+    .dash-header-left p {
+        font-size: .8rem;
+    }
+
+    .role-badge {
+        font-size: .65rem !important;
+    }
+
+    .dash-date {
+        font-size: .75rem;
+    }
+
+    .section-label {
+        font-size: .6rem;
+        margin-bottom: .75rem;
+    }
+
+    .stat-grid {
+        grid-template-columns: 1fr;
+        gap: .75rem;
+        margin-bottom: 1.7rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+        min-height: 120px;
+    }
+
+    .card-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .card-label {
+        font-size: .75rem;
+    }
+
+    .card-value {
+        font-size: 1.6rem;
+    }
+
+    .card-sub {
+        font-size: .7rem;
+    }
+
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+
+    .empty-state-icon {
+        width: 54px;
+        height: 54px;
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .dash-header-left h1 {
+        font-size: 1.2rem;
+    }
+
+    .stat-card {
+        padding: .9rem;
+    }
+}
 </style>
 
 <!-- ═══ PAGE HEADER ═══ -->
 <div class="dash-header">
     <div class="dash-header-left">
-        <h1>Hola, <span>{{ session.full_name.split()[0] }}</span></h1>
+        <h1>Hola, <span>{{ session.full_name.split()[0] if session.full_name else 'Usuario' }}</span></h1>
         <p>Panel principal · MiniMarket QuickStore</p>
         <div class="role-badge">
             <i class="fas fa-shield-alt"></i> {{ session.rol }}
@@ -234,10 +390,15 @@
     permissions_dashboard.can_view_sales or
     permissions_dashboard.can_view_cash or
     permissions_dashboard.can_view_payment_methods or
+    permissions_dashboard.can_view_discounts or
+    permissions_dashboard.can_view_promotions or
     permissions_dashboard.can_view_warehouses or
     permissions_dashboard.can_view_purchases or
     permissions_dashboard.can_view_inventory or
-    permissions_dashboard.can_view_output_notes
+    permissions_dashboard.can_view_output_notes or
+    permissions_dashboard.can_view_reports or
+    permissions_dashboard.get('can_view_sales_report') or
+    permissions_dashboard.get('can_view_profit_report')
 %}
 
 {% if has_any %}
@@ -392,7 +553,12 @@
 <!-- ─── FINANZAS ─── -->
 {% if permissions_dashboard.can_view_sales
    or permissions_dashboard.can_view_cash
-   or permissions_dashboard.can_view_payment_methods %}
+   or permissions_dashboard.can_view_payment_methods
+   or permissions_dashboard.can_view_discounts
+   or permissions_dashboard.can_view_promotions
+   or permissions_dashboard.can_view_reports
+   or permissions_dashboard.get('can_view_sales_report')
+   or permissions_dashboard.get('can_view_profit_report') %}
 
 <div class="section-label">Finanzas &amp; Ventas</div>
 
@@ -439,12 +605,88 @@
     </a>
     {% endif %}
 
+    {% if permissions_dashboard.can_view_discounts %}
+    <a class="stat-card" style="--card-accent:#facc15" href="{{ url_for('discounts.list_discounts') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-tags"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Descuentos activos</div>
+        <div class="card-value">{{ stats.discounts or 0 }}</div>
+        <div class="card-sub">
+            <span class="dot dot-warning"></span>
+            {{ stats.discounts_inactive or 0 }} inactivos
+        </div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.can_view_promotions %}
+    <a class="stat-card" style="--card-accent:#ec4899" href="{{ url_for('promotions.list_promotions') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-gift"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Promociones registradas</div>
+        <div class="card-value">{{ stats.promotions or 0 }}</div>
+        <div class="card-sub">
+            <span class="dot dot-info"></span>
+            {{ stats.active_promotions or 0 }} vigentes hoy
+        </div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.get('can_view_sales_report') %}
+    <a class="stat-card" style="--card-accent:#a78bfa" href="{{ url_for('reports.sales_report') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Reporte de Ventas</div>
+        <div class="card-value">CU17</div>
+        <div class="card-sub">
+            <span class="dot dot-info"></span>
+            Ventas, filtros y PDF
+        </div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.get('can_view_profit_report') %}
+    <a class="stat-card" style="--card-accent:#22c55e" href="{{ url_for('reports.profit_report') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Reporte de Utilidad</div>
+        <div class="card-value">CU17</div>
+        <div class="card-sub">
+            <span class="dot"></span>
+            Ganancia real del minimarket
+        </div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.can_view_reports
+       and not permissions_dashboard.get('can_view_sales_report')
+       and not permissions_dashboard.get('can_view_profit_report') %}
+    <a class="stat-card" style="--card-accent:#a78bfa" href="{{ url_for('reports.sales_report') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Reportes</div>
+        <div class="card-value">{{ stats.reports or 1 }}</div>
+        <div class="card-sub">
+            <span class="dot dot-info"></span>
+            Ventas y análisis
+        </div>
+    </a>
+    {% endif %}
+
 </div>
 {% endif %}
 
 {% else %}
 
-<!-- ─── EMPTY STATE ─── -->
 <div class="empty-state">
     <div class="empty-state-icon"><i class="fas fa-lock"></i></div>
     <h4>Sin módulos asignados</h4>
@@ -455,12 +697,23 @@
 
 <script>
 (function(){
+    const dateElement = document.getElementById('dashDate');
+
+    if (!dateElement) {
+        return;
+    }
+
     const d = new Date();
-    const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+    const opts = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+
     const str = d.toLocaleDateString('es-ES', opts);
 
-    document.getElementById('dashDate').textContent =
-        str.charAt(0).toUpperCase() + str.slice(1);
+    dateElement.textContent = str.charAt(0).toUpperCase() + str.slice(1);
 })();
 </script>
 

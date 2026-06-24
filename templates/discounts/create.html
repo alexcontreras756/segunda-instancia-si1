@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Descuento{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-plus-circle"></i> Nuevo Descuento</h1>
+    <p>Crear descuento para aplicar posteriormente en el registro de ventas.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="card system-card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-tag"></i> Datos del descuento</h5>
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST">
+
+                    <div class="alert alert-info">
+                        <strong>Nota:</strong> Si deja el código vacío, el sistema generará uno automáticamente.
+                        Ejemplo: DES001, DES002, DES003.
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="codigo" class="form-label">Código</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="codigo"
+                            name="codigo"
+                            maxlength="10"
+                            placeholder="Ej: DES001"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción *</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="descripcion"
+                            name="descripcion"
+                            maxlength="200"
+                            required
+                            placeholder="Ej: Descuento cliente frecuente"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="valor" class="form-label">Valor *</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            class="form-control"
+                            id="valor"
+                            name="valor"
+                            required
+                            placeholder="Ej: 10.00"
+                        >
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            id="es_porcentaje"
+                            name="es_porcentaje"
+                        >
+                        <label class="form-check-label" for="es_porcentaje">
+                            El valor es porcentaje
+                        </label>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_inicio" class="form-label">Fecha inicio</label>
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="fecha_inicio"
+                                name="fecha_inicio"
+                            >
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_fin" class="form-label">Fecha fin</label>
+                            <input
+                                type="date"
+                                class="form-control"
+                                id="fecha_fin"
+                                name="fecha_fin"
+                            >
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+
+                    <a href="{{ url_for('discounts.list_discounts') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

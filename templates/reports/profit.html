@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+
+{% block title %}Reporte de Utilidad{% endblock %}
+
+{% block content %}
+
+<style>
+    .profit-header {
+        background: linear-gradient(135deg, #14532d, #0f172a);
+        color: white;
+        border-radius: 18px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+    }
+
+    .profit-header h1 {
+        margin: 0;
+        font-weight: 800;
+    }
+
+    .profit-header p {
+        margin: 8px 0 0;
+        opacity: 0.9;
+    }
+
+    .profit-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .profit-stat {
+        border-radius: 16px;
+        padding: 18px;
+        background: #ffffff;
+        border: 1px solid rgba(0,0,0,0.08);
+        min-height: 120px;
+    }
+
+    .profit-stat small {
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+
+    .profit-stat h3 {
+        margin-top: 8px;
+        margin-bottom: 0;
+        font-weight: 800;
+    }
+
+    .table th {
+        white-space: nowrap;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .filter-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+        .profit-header {
+            padding: 18px;
+        }
+
+        .profit-header h1 {
+            font-size: 1.4rem;
+        }
+
+        .filter-actions {
+            flex-direction: column;
+        }
+
+        .filter-actions .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="profit-header">
+    <h1><i class="fas fa-chart-line"></i> CU17 - Reporte de Utilidad</h1>
+    <p>
+        Calcula la ganancia real usando ventas cobradas, costo de productos vendidos,
+        descuentos y promociones ya reflejados en el monto final.
+    </p>
+</div>
+
+<div class="card profit-card mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-filter"></i> Filtros del reporte
+        </h5>
+    </div>
+
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('reports.profit_report') }}">
+            <div class="row">
+
+                <div class="col-md-3 mb-3">
+                    <label for="fecha_inicio" class="form-label">Fecha inicio</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="fecha_inicio"
+                        name="fecha_inicio"
+                        value="{{ filters.fecha_inicio or '' }}"
+                    >
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="fecha_fin" class="form-label">Fecha fin</label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="fecha_fin"
+                        name="fecha_fin"
+                        value="{{ filters.fecha_fin or '' }}"
+                    >
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="codigo_usuario" class="form-label">Cajero</label>
+                    <select class="form-select" id="codigo_usuario" name="codigo_usuario">
+                        <option value="">Todos</option>
+
+                        {% for user in users %}
+                            <option
+                                value="{{ user.codigo }}"
+                                {% if filters.codigo_usuario == user.codigo %}selected{% endif %}
+                            >
+                                {{ user.nombre }} - {{ user.codigo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="codigo_producto" class="form-label">Producto</label>
+                    <select class="form-select" id="codigo_producto" name="codigo_producto">
+                        <option value="">Todos</option>
+
+                        {% for product in products %}
+                            <option
+                                value="{{ product.codigo }}"
+                                {% if filters.codigo_producto == product.codigo %}selected{% endif %}
+                            >
+                                {{ product.nombre }} - {{ product.codigo }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="id_tipo_pago" class="form-label">Tipo de pago</label>
+                    <select class="form-select" id="id_tipo_pago" name="id_tipo_pago">
+                        <option value="">Todos</option>
+
+                        {% for payment in payment_types %}
+                            <option
+                                value="{{ payment.id }}"
+                                {% if filters.id_tipo_pago and filters.id_tipo_pago|int == payment.id %}selected{% endif %}
+                            >
+                                {{ payment.nombre }}
+                                {% if not payment.activo %}(Inactivo){% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="estado" class="form-label">Estado</label>
+                    <select class="form-select" id="estado" name="estado">
+                        <option value="activa" {% if filters.estado == 'activa' %}selected{% endif %}>
+                            Solo activas
+                        </option>
+                        <option value="anulada" {% if filters.estado == 'anulada' %}selected{% endif %}>
+                            Solo anuladas
+                        </option>
+                        <option value="todos" {% if filters.estado == 'todos' %}selected{% endif %}>
+                            Todas
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label for="search" class="form-label">Búsqueda</label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="search"
+                        name="search"
+                        value="{{ filters.search or '' }}"
+                        placeholder="Factura, cliente, CI, cajero, producto, descuento o promoción"
+                    >
+                </div>
+
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Aplicar filtros
+                </button>
+
+                <a href="{{ url_for('reports.profit_report') }}" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </a>
+
+                <a href="{{ url_for('reports.profit_report_pdf') }}?{{ export_query }}" class="btn btn-danger">
+                    <i class="fas fa-file-pdf"></i> Descargar PDF
+                </a>
+
+                <a href="{{ url_for('reports.profit_report_excel') }}?{{ export_query }}" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Descargar Excel
+                </a>
+
+                <a href="{{ url_for('reports.sales_report') }}" class="btn btn-outline-info">
+                    <i class="fas fa-receipt"></i> Ver reporte de ventas
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-3 mb-3">
+        <div class="profit-stat">
+            <small>Facturas</small>
+            <h3>{{ summary.total_facturas }}</h3>
+            <div class="text-muted">
+                Activas: {{ summary.facturas_activas }} |
+                Anuladas: {{ summary.facturas_anuladas }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="profit-stat">
+            <small>Total final cobrado</small>
+            <h3 class="text-primary">
+                Bs {{ "%.2f"|format((summary.total_final_cobrado or 0)|float) }}
+            </h3>
+            <div class="text-muted">
+                Bruto: Bs {{ "%.2f"|format((summary.total_bruto or 0)|float) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="profit-stat">
+            <small>Costo vendido</small>
+            <h3 class="text-warning">
+                Bs {{ "%.2f"|format((summary.costo_total_productos or 0)|float) }}
+            </h3>
+            <div class="text-muted">
+                Base: precio de compra
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="profit-stat">
+            <small>Utilidad total</small>
+
+            {% if summary.utilidad_total >= 0 %}
+                <h3 class="text-success">
+                    Bs {{ "%.2f"|format((summary.utilidad_total or 0)|float) }}
+                </h3>
+            {% else %}
+                <h3 class="text-danger">
+                    Bs {{ "%.2f"|format((summary.utilidad_total or 0)|float) }}
+                </h3>
+            {% endif %}
+
+            <div class="text-muted">
+                Margen: {{ "%.2f"|format((summary.margen_global or 0)|float) }}%
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-6 mb-3">
+        <div class="card profit-card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-tie"></i> Resumen por cajero
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Cajero</th>
+                                <th>Facturas</th>
+                                <th>Final cobrado</th>
+                                <th>Costo</th>
+                                <th>Utilidad</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in summary.resumen_usuarios %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ item.usuario }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ item.codigo_usuario }}</small>
+                                    </td>
+                                    <td>{{ item.cantidad }}</td>
+                                    <td>Bs {{ "%.2f"|format((item.total_final_cobrado or 0)|float) }}</td>
+                                    <td>Bs {{ "%.2f"|format((item.costo_total_productos or 0)|float) }}</td>
+                                    <td>
+                                        {% if item.utilidad >= 0 %}
+                                            <span class="text-success">
+                                                Bs {{ "%.2f"|format((item.utilidad or 0)|float) }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-danger">
+                                                Bs {{ "%.2f"|format((item.utilidad or 0)|float) }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        No hay datos por cajero.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card profit-card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-credit-card"></i> Resumen por tipo de pago
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Tipo de pago</th>
+                                <th>Facturas</th>
+                                <th>Final cobrado</th>
+                                <th>Costo</th>
+                                <th>Utilidad</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for item in summary.resumen_tipos_pago %}
+                                <tr>
+                                    <td><strong>{{ item.tipo_pago }}</strong></td>
+                                    <td>{{ item.cantidad }}</td>
+                                    <td>Bs {{ "%.2f"|format((item.total_final_cobrado or 0)|float) }}</td>
+                                    <td>Bs {{ "%.2f"|format((item.costo_total_productos or 0)|float) }}</td>
+                                    <td>
+                                        {% if item.utilidad >= 0 %}
+                                            <span class="text-success">
+                                                Bs {{ "%.2f"|format((item.utilidad or 0)|float) }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-danger">
+                                                Bs {{ "%.2f"|format((item.utilidad or 0)|float) }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        No hay datos por tipo de pago.
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card profit-card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0">
+            <i class="fas fa-table"></i> Detalle de utilidad por factura
+        </h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="alert alert-info">
+            <strong>Fórmula aplicada:</strong>
+            Utilidad = Total final cobrado - Costo total de productos vendidos.
+            El total final ya incluye descuentos y promociones aplicadas.
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Factura</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Cajero</th>
+                        <th>Tipo Pago</th>
+                        <th>Total Bruto</th>
+                        <th>Final Cobrado</th>
+                        <th>Costo Vendido</th>
+                        <th>Utilidad</th>
+                        <th>Margen</th>
+                        <th>Desc./Promo.</th>
+                        <th>Promoción</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>
+                                <strong>{{ row.codigo_factura }}</strong>
+                                {% if row.referencia_externa %}
+                                    <br>
+                                    <small class="text-muted">{{ row.referencia_externa }}</small>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ row.fecha_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+
+                            <td>
+                                {{ row.cliente }}
+                                <br>
+                                <small class="text-muted">{{ row.cliente_ci }}</small>
+                            </td>
+
+                            <td>
+                                {{ row.usuario }}
+                                <br>
+                                <small class="text-muted">{{ row.codigo_usuario }}</small>
+                            </td>
+
+                            <td>{{ row.tipo_pago }}</td>
+
+                            <td>
+                                Bs {{ "%.2f"|format((row.total_bruto or 0)|float) }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    Bs {{ "%.2f"|format((row.total_final_cobrado or 0)|float) }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                Bs {{ "%.2f"|format((row.costo_total_productos or 0)|float) }}
+                            </td>
+
+                            <td>
+                                {% if row.utilidad >= 0 %}
+                                    <span class="badge bg-success">
+                                        Bs {{ "%.2f"|format((row.utilidad or 0)|float) }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        Bs {{ "%.2f"|format((row.utilidad or 0)|float) }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if row.margen_utilidad >= 0 %}
+                                    <span class="text-success">
+                                        {{ "%.2f"|format((row.margen_utilidad or 0)|float) }}%
+                                    </span>
+                                {% else %}
+                                    <span class="text-danger">
+                                        {{ "%.2f"|format((row.margen_utilidad or 0)|float) }}%
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                Bs {{ "%.2f"|format((row.descuento_total or 0)|float) }}
+                            </td>
+
+                            <td>
+                                {% if row.promociones %}
+                                    <span class="badge bg-info">{{ row.promociones }}</span>
+                                {% elif row.descuento %}
+                                    <span class="badge bg-warning text-dark">{{ row.descuento }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if row.estado %}
+                                    <span class="badge bg-success">Activa</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Anulada</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="13" class="text-center text-muted">
+                                No existen datos para los filtros seleccionados.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="5">Totales</th>
+                        <th>
+                            Bs {{ "%.2f"|format((summary.total_bruto or 0)|float) }}
+                        </th>
+                        <th>
+                            Bs {{ "%.2f"|format((summary.total_final_cobrado or 0)|float) }}
+                        </th>
+                        <th>
+                            Bs {{ "%.2f"|format((summary.costo_total_productos or 0)|float) }}
+                        </th>
+                        <th>
+                            Bs {{ "%.2f"|format((summary.utilidad_total or 0)|float) }}
+                        </th>
+                        <th>
+                            {{ "%.2f"|format((summary.margen_global or 0)|float) }}%
+                        </th>
+                        <th>
+                            Bs {{ "%.2f"|format((summary.descuento_total or 0)|float) }}
+                        </th>
+                        <th colspan="2"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

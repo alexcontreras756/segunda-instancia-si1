@@ -14,6 +14,8 @@ from models.purchase import Purchase
 from models.inventory import Inventory
 from models.output_note import OutputNote
 from models.payment_method import PaymentMethod
+from models.discount import Discount
+from models.promotion import Promotion
 
 from utils.decorators import login_required
 
@@ -31,6 +33,8 @@ from controllers.purchase_controller import purchase_bp
 from controllers.inventory_controller import inventory_bp
 from controllers.output_note_controller import output_note_bp
 from controllers.payment_method_controller import payment_method_bp
+from controllers.discount_controller import discount_bp
+from controllers.promotion_controller import promotion_bp
 from controllers.report_controller import report_bp
 
 
@@ -77,6 +81,8 @@ app.register_blueprint(purchase_bp)
 app.register_blueprint(inventory_bp)
 app.register_blueprint(output_note_bp)
 app.register_blueprint(payment_method_bp)
+app.register_blueprint(discount_bp)
+app.register_blueprint(promotion_bp)
 app.register_blueprint(report_bp)
 
 
@@ -117,7 +123,15 @@ def dashboard():
     can_view_inventory = Permission.has_permission(codigo_usuario, 'inventory_read')
     can_view_output_notes = Permission.has_permission(codigo_usuario, 'output_note_read')
     can_view_payment_methods = Permission.has_permission(codigo_usuario, 'payment_method_read')
-    can_view_reports = Permission.has_permission(codigo_usuario, 'report_sales_read')
+    can_view_discounts = Permission.has_permission(codigo_usuario, 'discount_read')
+    can_view_promotions = Permission.has_permission(codigo_usuario, 'promotion_read')
+
+    # Reportes
+    can_view_sales_report = Permission.has_permission(codigo_usuario, 'report_sales_read')
+    can_view_profit_report = Permission.has_permission(codigo_usuario, 'report_profit_read')
+
+    # Permiso general para mostrar el bloque de Reportes
+    can_view_reports = can_view_sales_report or can_view_profit_report
 
     stats = {}
 
@@ -170,8 +184,24 @@ def dashboard():
         stats['payment_methods'] = PaymentMethod.count_all(active_only=True)
         stats['payment_methods_inactive'] = PaymentMethod.count_inactive()
 
+    if can_view_discounts:
+        stats['discounts'] = Discount.count_all(active_only=True)
+        stats['discounts_inactive'] = Discount.count_inactive()
+
+    if can_view_promotions:
+        stats['promotions'] = Promotion.count_all()
+        stats['active_promotions'] = Promotion.count_active_valid()
+
     if can_view_reports:
-        stats['reports'] = 1
+        reports_count = 0
+
+        if can_view_sales_report:
+            reports_count += 1
+
+        if can_view_profit_report:
+            reports_count += 1
+
+        stats['reports'] = reports_count
 
     # Diccionario con permisos para mostrar los bloques correspondientes
     permissions_dashboard = {
@@ -188,7 +218,13 @@ def dashboard():
         'can_view_inventory': can_view_inventory,
         'can_view_output_notes': can_view_output_notes,
         'can_view_payment_methods': can_view_payment_methods,
-        'can_view_reports': can_view_reports
+        'can_view_discounts': can_view_discounts,
+        'can_view_promotions': can_view_promotions,
+
+        # Reportes
+        'can_view_reports': can_view_reports,
+        'can_view_sales_report': can_view_sales_report,
+        'can_view_profit_report': can_view_profit_report
     }
 
     return render_template(
@@ -199,4 +235,9 @@ def dashboard():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(
+        host='127.0.0.1',
+        port=5050,
+        debug=True,
+        use_reloader=False
+    )

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Descuentos{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-tags"></i> Gestión de Descuentos</h1>
+    <p>Administración de descuentos aplicables a las ventas del MiniMarket QuickStore.</p>
+</div>
+
+<div class="row mb-4">
+
+    <div class="col-md-4 mb-3">
+        <div class="card system-card bg-success text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-check-circle"></i> Descuentos activos</h5>
+                <h2>{{ active_count or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card system-card bg-secondary text-white">
+            <div class="card-body">
+                <h5><i class="fas fa-pause-circle"></i> Descuentos inactivos</h5>
+                <h2>{{ inactive_count or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card system-card">
+            <div class="card-body d-flex align-items-center justify-content-center h-100">
+                <a href="{{ url_for('discounts.create_discount') }}" class="btn btn-primary w-100">
+                    <i class="fas fa-plus"></i> Nuevo Descuento
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="card system-card mb-3">
+    <div class="card-body">
+        <form method="GET" class="row g-2 align-items-end">
+
+            <div class="col-md-10">
+                <label for="search" class="form-label">Buscar descuento</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="search"
+                    name="search"
+                    value="{{ search or '' }}"
+                    placeholder="Buscar por código o descripción"
+                >
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-info w-100">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div class="card system-card">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-list"></i> Lista de descuentos</h5>
+    </div>
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Vigente</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for discount in discounts %}
+                    <tr>
+                        <td>
+                            <strong>{{ discount.codigo }}</strong>
+                        </td>
+
+                        <td>{{ discount.descripcion }}</td>
+
+                        <td>
+                            {% if discount.es_porcentaje %}
+                                <span class="badge bg-info">Porcentaje</span>
+                            {% else %}
+                                <span class="badge bg-primary">Monto fijo</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if discount.es_porcentaje %}
+                                <strong>{{ "%.2f"|format(discount.valor|float) }}%</strong>
+                            {% else %}
+                                <strong>Bs {{ "%.2f"|format(discount.valor|float) }}</strong>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if discount.fecha_inicio %}
+                                {{ discount.fecha_inicio.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                <span class="text-muted">Sin inicio</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if discount.fecha_fin %}
+                                {{ discount.fecha_fin.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                <span class="text-muted">Sin fin</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if discount.vigente %}
+                                <span class="badge bg-success">Vigente</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">No vigente</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if discount.activo %}
+                                <span class="badge bg-success">Activo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactivo</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('discounts.edit_discount', codigo=discount.codigo) }}"
+                               class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            <a href="{{ url_for('discounts.toggle_discount', codigo=discount.codigo) }}"
+                               class="btn btn-sm {% if discount.activo %}btn-danger{% else %}btn-success{% endif %}"
+                               onclick="return confirm('¿Deseas cambiar el estado de este descuento?')">
+                                {% if discount.activo %}
+                                    <i class="fas fa-ban"></i>
+                                {% else %}
+                                    <i class="fas fa-check"></i>
+                                {% endif %}
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            No hay descuentos registrados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

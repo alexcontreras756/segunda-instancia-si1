@@ -3,55 +3,355 @@
 {% block title %}Lista de Usuarios{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1><i class="fas fa-users"></i> Usuarios</h1>
+
+<style>
+    .users-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .users-header h1 {
+        font-family: var(--font-head);
+        font-weight: 800;
+        color: var(--c-text);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+        letter-spacing: -.03em;
+    }
+
+    .users-header h1 i {
+        color: var(--c-accent);
+    }
+
+    .users-card {
+        background: var(--c-card);
+        border: 1px solid var(--c-border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .users-card-header {
+        padding: 1rem 1.25rem;
+        background: rgba(255,255,255,.03);
+        border-bottom: 1px solid var(--c-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: .75rem;
+    }
+
+    .users-card-header h5 {
+        margin: 0;
+        color: var(--c-text);
+        font-family: var(--font-head);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .users-card-header small {
+        color: var(--c-muted);
+    }
+
+    .users-table {
+        margin: 0;
+        color: var(--c-text);
+        background: transparent;
+    }
+
+    .users-table thead th {
+        background: #202733;
+        color: #ffffff;
+        border-bottom: 1px solid var(--c-border);
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-weight: 800;
+        padding: 1rem .85rem;
+        white-space: nowrap;
+    }
+
+    .users-table tbody tr {
+        background: transparent;
+        border-bottom: 1px solid rgba(255,255,255,.08);
+        transition: background .18s, transform .18s;
+    }
+
+    .users-table tbody tr:hover {
+        background: rgba(245,166,35,.08);
+    }
+
+    .users-table tbody td {
+        color: var(--c-text);
+        padding: .95rem .85rem;
+        vertical-align: middle;
+        border-color: rgba(255,255,255,.08);
+        font-size: .92rem;
+    }
+
+    .user-code {
+        font-family: var(--font-head);
+        font-weight: 800;
+        color: var(--c-accent);
+        letter-spacing: .02em;
+    }
+
+    .user-name {
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .user-ci {
+        color: #cbd5e1;
+    }
+
+    .badge-role-admin {
+        background: #e8374a;
+        color: #ffffff;
+        padding: .45rem .75rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 800;
+    }
+
+    .badge-role-cajero {
+        background: #22c5e8;
+        color: #ffffff;
+        padding: .45rem .75rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 800;
+    }
+
+    .badge-status-active {
+        background: #14935f;
+        color: #ffffff;
+        padding: .45rem .75rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 800;
+    }
+
+    .badge-status-inactive {
+        background: #64748b;
+        color: #ffffff;
+        padding: .45rem .75rem;
+        border-radius: 999px;
+        font-size: .75rem;
+        font-weight: 800;
+    }
+
+    .actions-group {
+        display: flex;
+        gap: .45rem;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: transform .15s, opacity .15s;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        opacity: .9;
+    }
+
+    .empty-users {
+        padding: 2.5rem 1rem;
+        text-align: center;
+        color: var(--c-muted);
+    }
+
+    .empty-users i {
+        font-size: 2rem;
+        margin-bottom: .75rem;
+        color: var(--c-muted);
+    }
+
+    @media (max-width: 767px) {
+        .users-header {
+            align-items: stretch;
+        }
+
+        .users-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .users-header .btn {
+            width: 100%;
+        }
+
+        .users-card-header {
+            align-items: flex-start;
+        }
+
+        .users-table thead {
+            display: none;
+        }
+
+        .users-table,
+        .users-table tbody,
+        .users-table tr,
+        .users-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .users-table tbody tr {
+            margin: .85rem;
+            border: 1px solid var(--c-border);
+            border-radius: 12px;
+            background: rgba(255,255,255,.03);
+            overflow: hidden;
+        }
+
+        .users-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding: .8rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+        }
+
+        .users-table tbody td:last-child {
+            border-bottom: none;
+        }
+
+        .users-table tbody td::before {
+            content: attr(data-label);
+            color: var(--c-muted);
+            font-size: .75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .actions-group {
+            justify-content: flex-end;
+        }
+    }
+</style>
+
+<div class="users-header">
+    <h1>
+        <i class="fas fa-users"></i>
+        Usuarios
+    </h1>
+
     <a href="{{ url_for('users.create_user') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nuevo Usuario
     </a>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>CI</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.codigo }}</td>
-                <td>{{ user.nombre }}</td>
-                <td>{{ user.ci or '-' }}</td>
-                <td>
-                    <span class="badge {% if user.rol == 'admin' %}bg-danger{% else %}bg-info{% endif %}">
-                        {{ user.rol }}
-                    </span>
-                </td>
-                <td>
-                    <span class="badge {% if user.estado %}bg-success{% else %}bg-secondary{% endif %}">
-                        {{ 'Activo' if user.estado else 'Inactivo' }}
-                    </span>
-                </td>
-                <td>
-                    <a href="{{ url_for('users.edit_user', user_id=user.codigo) }}" class="btn btn-sm btn-warning">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a href="{{ url_for('users.delete_user', user_id=user.codigo) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este usuario?')">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                    <a href="{{ url_for('permissions.assign_permissions', user_id=user.codigo) }}" class="btn btn-sm btn-info">
-                        <i class="fas fa-key"></i>
-                    </a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="users-card">
+    <div class="users-card-header">
+        <div>
+            <h5>
+                <i class="fas fa-list"></i>
+                Lista de usuarios
+            </h5>
+            <small>Administración de usuarios, roles, estado y permisos.</small>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table users-table align-middle">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>CI</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td data-label="Código">
+                        <span class="user-code">{{ user.codigo }}</span>
+                    </td>
+
+                    <td data-label="Nombre">
+                        <span class="user-name">{{ user.nombre }}</span>
+                    </td>
+
+                    <td data-label="CI">
+                        <span class="user-ci">{{ user.ci or '-' }}</span>
+                    </td>
+
+                    <td data-label="Rol">
+                        {% if user.rol == 'admin' %}
+                            <span class="badge-role-admin">admin</span>
+                        {% else %}
+                            <span class="badge-role-cajero">{{ user.rol }}</span>
+                        {% endif %}
+                    </td>
+
+                    <td data-label="Estado">
+                        {% if user.estado %}
+                            <span class="badge-status-active">Activo</span>
+                        {% else %}
+                            <span class="badge-status-inactive">Inactivo</span>
+                        {% endif %}
+                    </td>
+
+                    <td data-label="Acciones">
+                        <div class="actions-group">
+                            <a href="{{ url_for('users.edit_user', user_id=user.codigo) }}"
+                               class="btn btn-warning btn-sm action-btn"
+                               title="Editar usuario">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            <a href="{{ url_for('users.delete_user', user_id=user.codigo) }}"
+                               class="btn btn-danger btn-sm action-btn"
+                               title="Eliminar usuario"
+                               onclick="return confirm('¿Eliminar este usuario?')">
+                                <i class="fas fa-trash"></i>
+                            </a>
+
+                            <a href="{{ url_for('permissions.assign_permissions', user_id=user.codigo) }}"
+                               class="btn btn-info btn-sm action-btn"
+                               title="Asignar permisos">
+                                <i class="fas fa-key"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-users">
+                            <i class="fas fa-users-slash"></i>
+                            <div>No hay usuarios registrados.</div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
 {% endblock %}

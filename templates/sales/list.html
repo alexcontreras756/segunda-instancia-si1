@@ -9,8 +9,10 @@
     <p>Registro y consulta de ventas realizadas en MiniMarket QuickStore.</p>
 </div>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4><i class="fas fa-list"></i> Ventas registradas</h4>
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+    <h4 class="mb-0">
+        <i class="fas fa-list"></i> Ventas registradas
+    </h4>
 
     <a href="{{ url_for('sales.create_sale') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Nueva Venta
@@ -34,7 +36,10 @@
                         <th>Cliente</th>
                         <th>Cajero</th>
                         <th>Tipo Pago</th>
-                        <th>Total</th>
+                        <th>Descuento</th>
+                        <th>Promoción</th>
+                        <th>Total Bruto</th>
+                        <th>Total Final</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -42,6 +47,13 @@
 
                 <tbody>
                     {% for sale in sales %}
+
+                    {% set monto_total = (sale.monto_total or 0)|float %}
+                    {% set monto_final = (sale.monto_final or 0)|float %}
+                    {% set monto_promocion = (sale.monto_promocion or 0)|float %}
+                    {% set descuento_estimado = monto_total - monto_final - monto_promocion %}
+                    {% set monto_descuento = descuento_estimado if descuento_estimado > 0 else 0 %}
+
                     <tr>
                         <td>
                             <strong>{{ sale.codigo }}</strong>
@@ -54,7 +66,9 @@
                         <td>
                             {{ sale.cliente }}
                             <br>
-                            <small class="text-muted">CI: {{ sale.cliente_ci or '-' }}</small>
+                            <small class="text-muted">
+                                CI: {{ sale.cliente_ci or '-' }}
+                            </small>
                         </td>
 
                         <td>{{ sale.usuario }}</td>
@@ -62,7 +76,57 @@
                         <td>{{ sale.tipo_pago }}</td>
 
                         <td>
-                            <strong>Bs {{ "%.2f"|format(sale.monto_final) }}</strong>
+                            {% if sale.codigo_descuento %}
+                                <span class="badge bg-warning text-dark">
+                                    {{ sale.codigo_descuento }}
+                                </span>
+
+                                <br>
+
+                                <small class="text-muted">
+                                    {{ sale.descuento_descripcion or 'Descuento aplicado' }}
+                                </small>
+
+                                <br>
+
+                                <small class="text-warning">
+                                    - Bs {{ "%.2f"|format(monto_descuento) }}
+                                </small>
+                            {% else %}
+                                <span class="text-muted">Sin descuento</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if sale.promocion_nombre %}
+                                <span class="badge bg-primary">
+                                    ID {{ sale.id_promocion }}
+                                </span>
+
+                                <br>
+
+                                <small class="text-muted">
+                                    {{ sale.promocion_nombre }}
+                                </small>
+
+                                <br>
+
+                                <small class="text-primary">
+                                    - Bs {{ "%.2f"|format(monto_promocion) }}
+                                </small>
+                            {% else %}
+                                <span class="text-muted">Sin promoción</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            Bs {{ "%.2f"|format(monto_total) }}
+                        </td>
+
+                        <td>
+                            <strong class="text-success">
+                                Bs {{ "%.2f"|format(monto_final) }}
+                            </strong>
                         </td>
 
                         <td>
@@ -74,24 +138,28 @@
                         </td>
 
                         <td>
-                            <a href="{{ url_for('sales.detail_sale', codigo=sale.codigo) }}"
-                               class="btn btn-sm btn-info">
-                                <i class="fas fa-eye"></i>
-                            </a>
+                            <div class="d-flex gap-1">
+                                <a href="{{ url_for('sales.detail_sale', codigo=sale.codigo) }}"
+                                   class="btn btn-sm btn-info"
+                                   title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
 
-                            {% if sale.estado %}
-                            <a href="{{ url_for('sales.cancel_sale', codigo=sale.codigo) }}"
-                               class="btn btn-sm btn-danger"
-                               onclick="return confirm('¿Seguro que deseas anular esta venta?')">
-                                <i class="fas fa-ban"></i>
-                            </a>
-                            {% endif %}
+                                {% if sale.estado %}
+                                <a href="{{ url_for('sales.cancel_sale', codigo=sale.codigo) }}"
+                                   class="btn btn-sm btn-danger"
+                                   title="Anular venta"
+                                   onclick="return confirm('¿Seguro que deseas anular esta venta?')">
+                                    <i class="fas fa-ban"></i>
+                                </a>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
 
                     {% else %}
                     <tr>
-                        <td colspan="8" class="text-center text-muted">
+                        <td colspan="11" class="text-center text-muted">
                             No hay ventas registradas.
                         </td>
                     </tr>

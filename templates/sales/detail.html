@@ -4,6 +4,12 @@
 
 {% block content %}
 
+{% set monto_total = (sale.monto_total or 0)|float %}
+{% set monto_final = (sale.monto_final or 0)|float %}
+{% set monto_promocion = (sale.monto_promocion or 0)|float %}
+{% set descuento_estimado = monto_total - monto_final - monto_promocion %}
+{% set monto_descuento = descuento_estimado if descuento_estimado > 0 else 0 %}
+
 <div class="page-header">
     <h1><i class="fas fa-receipt"></i> Detalle de Venta {{ sale.codigo }}</h1>
     <p>Información completa de la factura registrada.</p>
@@ -50,6 +56,17 @@
                 </p>
 
                 <p>
+                    <strong>Referencia externa:</strong>
+                    {% if sale.referencia_externa %}
+                        <span class="badge bg-info text-dark">
+                            {{ sale.referencia_externa }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted">Sin referencia</span>
+                    {% endif %}
+                </p>
+
+                <p>
                     <strong>Estado:</strong>
                     {% if sale.estado %}
                         <span class="badge bg-success">Activa</span>
@@ -70,10 +87,69 @@
 
             <div class="card-body">
 
-                <h5>Monto total:</h5>
+                <p>
+                    <strong>Monto total bruto:</strong>
+                    Bs {{ "%.2f"|format(monto_total) }}
+                </p>
+
+                <p>
+                    <strong>Descuento aplicado:</strong>
+
+                    {% if sale.codigo_descuento %}
+                        <span class="badge bg-warning text-dark">
+                            {{ sale.codigo_descuento }}
+                        </span>
+
+                        {{ sale.descuento_descripcion }}
+
+                        {% if sale.descuento_es_porcentaje %}
+                            <span class="text-muted">
+                                ({{ "%.2f"|format((sale.descuento_valor or 0)|float) }}%)
+                            </span>
+                        {% else %}
+                            <span class="text-muted">
+                                (Bs {{ "%.2f"|format((sale.descuento_valor or 0)|float) }})
+                            </span>
+                        {% endif %}
+
+                        <br>
+
+                        <strong>Monto descontado:</strong>
+                        <span class="text-warning">
+                            Bs {{ "%.2f"|format(monto_descuento) }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted">Sin descuento</span>
+                    {% endif %}
+                </p>
+
+                <p>
+                    <strong>Promoción aplicada:</strong>
+
+                    {% if sale.promocion_nombre %}
+                        <span class="badge bg-primary">
+                            ID {{ sale.id_promocion }}
+                        </span>
+
+                        {{ sale.promocion_nombre }}
+
+                        <br>
+
+                        <strong>Monto por promoción:</strong>
+                        <span class="text-primary">
+                            Bs {{ "%.2f"|format(monto_promocion) }}
+                        </span>
+                    {% else %}
+                        <span class="text-muted">Sin promoción</span>
+                    {% endif %}
+                </p>
+
+                <hr>
+
+                <h5>Monto final:</h5>
 
                 <h2 class="text-success">
-                    Bs {{ "%.2f"|format(sale.monto_final) }}
+                    Bs {{ "%.2f"|format(monto_final) }}
                 </h2>
 
                 <p>
@@ -117,9 +193,11 @@
                         <td>{{ detail.codigo_producto }}</td>
                         <td>{{ detail.producto }}</td>
                         <td>{{ detail.cantidad }}</td>
-                        <td>Bs {{ "%.2f"|format(detail.precio_unitario) }}</td>
+                        <td>Bs {{ "%.2f"|format((detail.precio_unitario or 0)|float) }}</td>
                         <td>
-                            <strong>Bs {{ "%.2f"|format(detail.subtotal) }}</strong>
+                            <strong>
+                                Bs {{ "%.2f"|format((detail.subtotal or 0)|float) }}
+                            </strong>
                         </td>
                     </tr>
                     {% else %}
@@ -133,8 +211,35 @@
 
                 <tfoot>
                     <tr>
-                        <th colspan="4" class="text-end">TOTAL:</th>
-                        <th>Bs {{ "%.2f"|format(sale.monto_final) }}</th>
+                        <th colspan="4" class="text-end">TOTAL BRUTO:</th>
+                        <th>
+                            Bs {{ "%.2f"|format(monto_total) }}
+                        </th>
+                    </tr>
+
+                    {% if sale.codigo_descuento %}
+                    <tr>
+                        <th colspan="4" class="text-end">DESCUENTO:</th>
+                        <th class="text-warning">
+                            - Bs {{ "%.2f"|format(monto_descuento) }}
+                        </th>
+                    </tr>
+                    {% endif %}
+
+                    {% if sale.promocion_nombre %}
+                    <tr>
+                        <th colspan="4" class="text-end">PROMOCIÓN:</th>
+                        <th class="text-primary">
+                            - Bs {{ "%.2f"|format(monto_promocion) }}
+                        </th>
+                    </tr>
+                    {% endif %}
+
+                    <tr>
+                        <th colspan="4" class="text-end">TOTAL FINAL:</th>
+                        <th class="text-success">
+                            Bs {{ "%.2f"|format(monto_final) }}
+                        </th>
                     </tr>
                 </tfoot>
 

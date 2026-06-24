@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Promociones{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-tags"></i> Gestión de Promociones</h1>
+    <p>Administra promociones por monto general o por producto específico.</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card system-card bg-primary text-white">
+            <div class="card-body">
+                <h5>Total promociones</h5>
+                <h2>{{ total_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card system-card bg-success text-white">
+            <div class="card-body">
+                <h5>Activas</h5>
+                <h2>{{ active_count }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card system-card bg-warning text-dark">
+            <div class="card-body">
+                <h5>Vigentes hoy</h5>
+                <h2>{{ valid_count }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-2">
+    <form method="GET" class="d-flex gap-2">
+        <input
+            type="text"
+            name="search"
+            class="form-control"
+            placeholder="Buscar promoción..."
+            value="{{ search or '' }}"
+        >
+
+        <button type="submit" class="btn btn-dark">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+    </form>
+
+    <a href="{{ url_for('promotions.create_promotion') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nueva Promoción
+    </a>
+</div>
+
+<div class="card system-card">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-list"></i> Lista de promociones</h5>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Producto</th>
+                        <th>Valor</th>
+                        <th>Compra mínima</th>
+                        <th>Vigencia</th>
+                        <th>Estado</th>
+                        <th>Vigente</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for promotion in promotions %}
+                    <tr>
+                        <td><strong>{{ promotion.codigo }}</strong></td>
+
+                        <td>
+                            <strong>{{ promotion.nombre }}</strong>
+                            <br>
+                            <small class="text-muted">{{ promotion.descripcion or 'Sin descripción' }}</small>
+                        </td>
+
+                        <td>
+                            {% if promotion.tipo_aplicacion == 'producto' %}
+                                <span class="badge bg-info">Producto</span>
+                            {% else %}
+                                <span class="badge bg-primary">Monto general</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ promotion.producto or '-' }}</td>
+
+                        <td>
+                            {% if promotion.es_porcentaje %}
+                                {{ "%.2f"|format((promotion.valor or 0)|float) }}%
+                            {% else %}
+                                Bs {{ "%.2f"|format((promotion.valor or 0)|float) }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            Bs {{ "%.2f"|format((promotion.compra_minima or 0)|float) }}
+                        </td>
+
+                        <td>
+                            {{ promotion.fecha_inicio.strftime('%d/%m/%Y') }}
+                            <br>
+                            <small>hasta {{ promotion.fecha_fin.strftime('%d/%m/%Y') }}</small>
+                        </td>
+
+                        <td>
+                            {% if promotion.activo %}
+                                <span class="badge bg-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactiva</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if promotion.vigente %}
+                                <span class="badge bg-success">Sí</span>
+                            {% else %}
+                                <span class="badge bg-danger">No</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('promotions.edit_promotion', codigo=promotion.codigo) }}"
+                               class="btn btn-sm btn-warning">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            <a href="{{ url_for('promotions.toggle_promotion', codigo=promotion.codigo) }}"
+                               class="btn btn-sm {% if promotion.activo %}btn-secondary{% else %}btn-success{% endif %}"
+                               onclick="return confirm('¿Cambiar estado de esta promoción?')">
+                                {% if promotion.activo %}
+                                    <i class="fas fa-ban"></i>
+                                {% else %}
+                                    <i class="fas fa-check"></i>
+                                {% endif %}
+                            </a>
+                        </td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted">
+                            No hay promociones registradas.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

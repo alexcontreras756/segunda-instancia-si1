@@ -6,7 +6,7 @@
 
 <div class="page-header">
     <h1><i class="fas fa-cash-register"></i> Registrar Venta</h1>
-    <p>Seleccione cliente, productos y tipo de pago para generar una nueva venta.</p>
+    <p>Seleccione cliente, productos, descuento, promoción y tipo de pago para generar una nueva venta.</p>
 </div>
 
 <form method="POST" id="sale-form">
@@ -16,7 +16,7 @@
         <div class="col-md-5 mb-3">
             <div class="card system-card">
                 <div class="card-header bg-primary text-white">
-                    <h5><i class="fas fa-user"></i> Datos del cliente</h5>
+                    <h5><i class="fas fa-user"></i> Datos de la venta</h5>
                 </div>
 
                 <div class="card-body">
@@ -32,6 +32,77 @@
                             </option>
                             {% endfor %}
                         </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="codigo_descuento" class="form-label">Descuento</label>
+                        <select class="form-select" id="codigo_descuento" name="codigo_descuento">
+                            <option value=""
+                                    data-valor="0"
+                                    data-porcentaje="0">
+                                Sin descuento
+                            </option>
+
+                            {% for discount in discounts %}
+                            <option value="{{ discount.codigo }}"
+                                    data-valor="{{ discount.valor }}"
+                                    data-porcentaje="{% if discount.es_porcentaje %}1{% else %}0{% endif %}">
+                                {{ discount.codigo }} - {{ discount.descripcion }}
+                                {% if discount.es_porcentaje %}
+                                    ({{ "%.2f"|format(discount.valor|float) }}%)
+                                {% else %}
+                                    (Bs {{ "%.2f"|format(discount.valor|float) }})
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">
+                            Solo aparecen descuentos activos y vigentes.
+                        </small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_promocion" class="form-label">Promoción</label>
+                        <select class="form-select" id="id_promocion" name="id_promocion">
+                            <option value=""
+                                    data-valor="0"
+                                    data-porcentaje="0"
+                                    data-tipo="monto"
+                                    data-products=""
+                                    data-total-products="0">
+                                Sin promoción
+                            </option>
+
+                            {% for promotion in promotions %}
+                                {% set promo_valor = (promotion.valor or 0)|float %}
+                                <option value="{{ promotion.id }}"
+                                        data-valor="{{ promotion.valor or 0 }}"
+                                        data-porcentaje="{% if promotion.es_porcentaje %}1{% else %}0{% endif %}"
+                                        data-tipo="{{ promotion.tipo_aplicacion or 'producto' }}"
+                                        data-products="{{ promotion.product_codes or '' }}"
+                                        data-total-products="{{ promotion.total_productos or 0 }}">
+                                    {{ promotion.nombre }}
+
+                                    {% if promo_valor > 0 %}
+                                        -
+                                        {% if promotion.es_porcentaje %}
+                                            {{ "%.2f"|format(promo_valor) }}%
+                                        {% else %}
+                                            Bs {{ "%.2f"|format(promo_valor) }}
+                                        {% endif %}
+                                    {% else %}
+                                        - promoción registrada
+                                    {% endif %}
+
+                                    {% if promotion.productos %}
+                                        / {{ promotion.productos }}
+                                    {% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">
+                            Solo aparecen promociones activas y vigentes.
+                        </small>
                     </div>
 
                     <div class="mb-3">
@@ -56,6 +127,59 @@
                             name="referencia_externa"
                             placeholder="Ej: número de transferencia, QR, comprobante"
                         >
+                        <small class="text-muted" id="reference-help">
+                            Si selecciona QR, la referencia se generará automáticamente.
+                        </small>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- BLOQUE QR SIMULADO -->
+            <div class="card system-card mt-3 d-none" id="qr-section">
+                <div class="card-header bg-dark text-white">
+                    <h5><i class="fas fa-qrcode"></i> Pago QR Simulado</h5>
+                </div>
+
+                <div class="card-body text-center">
+
+                    <div class="alert alert-info text-start">
+                        <strong>Modo simulación:</strong>
+                        este QR es visual y sirve para representar un pago QR dentro del sistema QuickStore.
+                    </div>
+
+                    <div class="mb-3">
+                        <canvas id="qr-canvas" width="220" height="220" style="border: 1px solid #ddd; background: #fff;"></canvas>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Comercio:</strong> QuickStore
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Monto a pagar:</strong>
+                        <span class="text-success fs-5">Bs <span id="qr-amount">0.00</span></span>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Referencia QR:</strong>
+                        <span id="qr-reference-label" class="text-primary">-</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Concepto:</strong> Venta en MiniMarket QuickStore
+                    </div>
+
+                    <div class="form-check text-start">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="qr_payment_confirmed"
+                            name="qr_payment_confirmed"
+                        >
+                        <label class="form-check-label" for="qr_payment_confirmed">
+                            Confirmo que el pago QR fue recibido
+                        </label>
                     </div>
 
                 </div>
@@ -91,7 +215,7 @@
                                             {% for product in products %}
                                             <option value="{{ product.codigo }}"
                                                     data-price="{{ product.precio_venta }}">
-                                                {{ product.nombre }} - Bs {{ "%.2f"|format(product.precio_venta) }}
+                                                {{ product.nombre }} - Bs {{ "%.2f"|format(product.precio_venta|float) }}
                                             </option>
                                             {% endfor %}
                                         </select>
@@ -147,19 +271,44 @@
     </div>
 
     <div class="card system-card mt-3">
-        <div class="card-body d-flex justify-content-between align-items-center">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
 
             <div>
-                <h4 class="mb-0">
-                    Total:
-                    <span class="text-success">
+                <h5 class="mb-1">
+                    Total bruto:
+                    <span class="text-info">
                         Bs <span id="total-sale">0.00</span>
                     </span>
-                </h4>
+                </h5>
+
+                <h5 class="mb-1">
+                    Descuento:
+                    <span class="text-warning">
+                        Bs <span id="discount-amount">0.00</span>
+                    </span>
+                </h5>
+
+                <h5 class="mb-1">
+                    Promoción:
+                    <span class="text-primary">
+                        Bs <span id="promotion-amount">0.00</span>
+                    </span>
+                </h5>
+
+                <h3 class="mb-0">
+                    Total final:
+                    <span class="text-success">
+                        Bs <span id="final-total">0.00</span>
+                    </span>
+                </h3>
+
+                <small class="text-muted">
+                    El servidor valida nuevamente el descuento y la promoción al registrar.
+                </small>
             </div>
 
             <div>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="submit-sale-btn">
                     <i class="fas fa-save"></i> Registrar Venta
                 </button>
 
@@ -175,13 +324,244 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const saleForm = document.getElementById('sale-form');
     const itemsBody = document.getElementById('items-body');
     const addRowButton = document.getElementById('add-row');
+
     const totalSale = document.getElementById('total-sale');
+    const discountSelect = document.getElementById('codigo_descuento');
+    const promotionSelect = document.getElementById('id_promocion');
+
+    const discountAmount = document.getElementById('discount-amount');
+    const promotionAmount = document.getElementById('promotion-amount');
+    const finalTotal = document.getElementById('final-total');
+
+    const paymentTypeSelect = document.getElementById('id_tipo_pago');
+    const referenceInput = document.getElementById('referencia_externa');
+    const referenceHelp = document.getElementById('reference-help');
+
+    const qrSection = document.getElementById('qr-section');
+    const qrAmount = document.getElementById('qr-amount');
+    const qrReferenceLabel = document.getElementById('qr-reference-label');
+    const qrCanvas = document.getElementById('qr-canvas');
+    const confirmQrPayment = document.getElementById('qr_payment_confirmed');
+    const submitSaleBtn = document.getElementById('submit-sale-btn');
 
     function toNumber(value) {
         const number = parseFloat(value);
         return isNaN(number) ? 0 : number;
+    }
+
+    function getCurrentFinalTotal() {
+        return toNumber(finalTotal.textContent);
+    }
+
+    function getSelectedPaymentName() {
+        const selectedOption = paymentTypeSelect.options[paymentTypeSelect.selectedIndex];
+        if (!selectedOption) return '';
+        return (selectedOption.text || '').trim().toLowerCase();
+    }
+
+    function isQrSelected() {
+        const paymentName = getSelectedPaymentName();
+        return paymentName.includes('qr');
+    }
+
+    function getTotalBruto() {
+        let total = 0;
+
+        document.querySelectorAll('.subtotal-input').forEach(function (input) {
+            total += toNumber(input.value);
+        });
+
+        return total;
+    }
+
+    function calculateDiscount(total) {
+        const selectedOption = discountSelect.options[discountSelect.selectedIndex];
+
+        if (!selectedOption || !selectedOption.value) {
+            return 0;
+        }
+
+        const valor = toNumber(selectedOption.dataset.valor);
+        const esPorcentaje = selectedOption.dataset.porcentaje === '1';
+
+        let discount = 0;
+
+        if (esPorcentaje) {
+            discount = total * valor / 100;
+        } else {
+            discount = valor;
+        }
+
+        if (discount > total) {
+            discount = total;
+        }
+
+        return discount;
+    }
+
+    function getSelectedProductSubtotals() {
+        const result = [];
+
+        document.querySelectorAll('.item-row').forEach(function (row) {
+            const productSelect = row.querySelector('.product-select');
+            const subtotalInput = row.querySelector('.subtotal-input');
+
+            const codigoProducto = productSelect.value;
+            const subtotal = toNumber(subtotalInput.value);
+
+            if (codigoProducto) {
+                result.push({
+                    codigo_producto: codigoProducto,
+                    subtotal: subtotal
+                });
+            }
+        });
+
+        return result;
+    }
+
+    function calculatePromotion(totalAfterDiscount) {
+        const selectedOption = promotionSelect.options[promotionSelect.selectedIndex];
+
+        if (!selectedOption || !selectedOption.value) {
+            return 0;
+        }
+
+        const valor = toNumber(selectedOption.dataset.valor);
+        const esPorcentaje = selectedOption.dataset.porcentaje === '1';
+        const tipo = selectedOption.dataset.tipo || 'producto';
+        const productsText = selectedOption.dataset.products || '';
+        const totalProducts = parseInt(selectedOption.dataset.totalProducts || '0');
+
+        if (valor <= 0) {
+            return 0;
+        }
+
+        let baseCalculation = totalAfterDiscount;
+
+        const productCodes = productsText
+            .split(',')
+            .map(function (item) {
+                return item.trim();
+            })
+            .filter(function (item) {
+                return item !== '';
+            });
+
+        if (tipo === 'producto' && productCodes.length > 0) {
+            baseCalculation = 0;
+
+            const selectedProducts = getSelectedProductSubtotals();
+
+            selectedProducts.forEach(function (item) {
+                if (productCodes.includes(item.codigo_producto)) {
+                    baseCalculation += item.subtotal;
+                }
+            });
+        }
+
+        if (tipo === 'producto' && productCodes.length === 0 && totalProducts > 0) {
+            baseCalculation = totalAfterDiscount;
+        }
+
+        if (baseCalculation <= 0) {
+            return 0;
+        }
+
+        let promotion = 0;
+
+        if (esPorcentaje) {
+            promotion = baseCalculation * valor / 100;
+        } else {
+            promotion = valor;
+        }
+
+        if (promotion > totalAfterDiscount) {
+            promotion = totalAfterDiscount;
+        }
+
+        return promotion;
+    }
+
+    function generateQrReference() {
+        const now = new Date();
+
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mi = String(now.getMinutes()).padStart(2, '0');
+        const ss = String(now.getSeconds()).padStart(2, '0');
+        const rand = Math.floor(1000 + Math.random() * 9000);
+
+        return `QR-${yyyy}${mm}${dd}-${hh}${mi}${ss}-${rand}`;
+    }
+
+    function hashString(text) {
+        let hash = 0;
+
+        for (let i = 0; i < text.length; i++) {
+            hash = ((hash << 5) - hash) + text.charCodeAt(i);
+            hash |= 0;
+        }
+
+        return Math.abs(hash);
+    }
+
+    function drawFinderPattern(ctx, x, y, size) {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(x, y, size, size);
+
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(x + size * 0.15, y + size * 0.15, size * 0.70, size * 0.70);
+
+        ctx.fillStyle = '#000';
+        ctx.fillRect(x + size * 0.30, y + size * 0.30, size * 0.40, size * 0.40);
+    }
+
+    function renderFakeQr(data) {
+        const ctx = qrCanvas.getContext('2d');
+        const size = qrCanvas.width;
+        const cells = 29;
+        const cellSize = size / cells;
+
+        ctx.clearRect(0, 0, size, size);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, size, size);
+
+        drawFinderPattern(ctx, 0, 0, cellSize * 7);
+        drawFinderPattern(ctx, size - cellSize * 7, 0, cellSize * 7);
+        drawFinderPattern(ctx, 0, size - cellSize * 7, cellSize * 7);
+
+        const seed = hashString(data);
+
+        for (let row = 0; row < cells; row++) {
+            for (let col = 0; col < cells; col++) {
+
+                const inTopLeft = row < 8 && col < 8;
+                const inTopRight = row < 8 && col > cells - 9;
+                const inBottomLeft = row > cells - 9 && col < 8;
+
+                if (inTopLeft || inTopRight || inBottomLeft) {
+                    continue;
+                }
+
+                const v = (row * col + seed + row + col) % 7;
+
+                if (v === 0 || v === 2 || v === 5) {
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(
+                        col * cellSize,
+                        row * cellSize,
+                        cellSize,
+                        cellSize
+                    );
+                }
+            }
+        }
     }
 
     function updateRow(row) {
@@ -202,19 +582,72 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateTotal() {
-        let total = 0;
-
-        document.querySelectorAll('.subtotal-input').forEach(function (input) {
-            total += toNumber(input.value);
-        });
+        const total = getTotalBruto();
+        const discount = calculateDiscount(total);
+        const subtotalAfterDiscount = total - discount;
+        const promotion = calculatePromotion(subtotalAfterDiscount);
+        const final = subtotalAfterDiscount - promotion;
 
         totalSale.textContent = total.toFixed(2);
+        discountAmount.textContent = discount.toFixed(2);
+        promotionAmount.textContent = promotion.toFixed(2);
+        finalTotal.textContent = final.toFixed(2);
+
+        qrAmount.textContent = final.toFixed(2);
+
+        updateQrSection();
     }
 
     function refreshAllRows() {
         document.querySelectorAll('.item-row').forEach(function (row) {
             updateRow(row);
         });
+    }
+
+    function updateQrSection() {
+        const qrSelected = isQrSelected();
+        const total = getCurrentFinalTotal();
+
+        if (qrSelected) {
+            qrSection.classList.remove('d-none');
+
+            if (!referenceInput.value || !referenceInput.value.startsWith('QR-')) {
+                referenceInput.value = generateQrReference();
+            }
+
+            referenceInput.readOnly = true;
+            qrReferenceLabel.textContent = referenceInput.value;
+
+            referenceHelp.textContent = 'La referencia QR se genera automáticamente y se guardará con la venta.';
+            submitSaleBtn.innerHTML = '<i class="fas fa-check-circle"></i> Confirmar y Registrar Venta';
+
+            const qrData = [
+                'COMERCIO=QuickStore',
+                'METODO=QR',
+                `MONTO=${total.toFixed(2)}`,
+                `REFERENCIA=${referenceInput.value}`,
+                'CONCEPTO=Venta MiniMarket QuickStore'
+            ].join('|');
+
+            renderFakeQr(qrData);
+        } else {
+            qrSection.classList.add('d-none');
+            confirmQrPayment.checked = false;
+
+            referenceInput.readOnly = false;
+            qrReferenceLabel.textContent = '-';
+            referenceHelp.textContent = 'Puede ingresar una referencia opcional como número de transferencia o comprobante.';
+            submitSaleBtn.innerHTML = '<i class="fas fa-save"></i> Registrar Venta';
+
+            const currentValue = referenceInput.value || '';
+
+            if (currentValue.startsWith('QR-')) {
+                referenceInput.value = '';
+            }
+
+            const ctx = qrCanvas.getContext('2d');
+            ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+        }
     }
 
     addRowButton.addEventListener('click', function () {
@@ -260,7 +693,49 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    paymentTypeSelect.addEventListener('change', function () {
+        updateQrSection();
+    });
+
+    discountSelect.addEventListener('change', function () {
+        updateTotal();
+    });
+
+    promotionSelect.addEventListener('change', function () {
+        updateTotal();
+    });
+
+    referenceInput.addEventListener('input', function () {
+        if (isQrSelected()) {
+            qrReferenceLabel.textContent = referenceInput.value || '-';
+        }
+    });
+
+    saleForm.addEventListener('submit', function (event) {
+        const qrSelected = isQrSelected();
+        const total = getCurrentFinalTotal();
+
+        if (total <= 0) {
+            event.preventDefault();
+            alert('El total final de la venta debe ser mayor a cero.');
+            return;
+        }
+
+        if (qrSelected) {
+            if (!referenceInput.value) {
+                referenceInput.value = generateQrReference();
+            }
+
+            if (!confirmQrPayment.checked) {
+                event.preventDefault();
+                alert('Debe confirmar que el pago QR fue recibido antes de registrar la venta.');
+                return;
+            }
+        }
+    });
+
     refreshAllRows();
+    updateQrSection();
 });
 </script>
 

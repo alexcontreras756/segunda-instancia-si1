@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     <style>
-        /* ─── TOKENS ─── */
         :root {
             --c-bg:        #0d1117;
             --c-surface:   #161b22;
@@ -31,7 +30,6 @@
             --shadow:      0 4px 24px rgba(0,0,0,.45);
         }
 
-        /* ─── RESET / BASE ─── */
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
@@ -55,7 +53,6 @@
             z-index: 0;
         }
 
-        /* ─── TOP NAV ─── */
         .qs-nav {
             position: fixed;
             top: 0;
@@ -150,6 +147,7 @@
             display: flex;
             align-items: center;
             gap: .75rem;
+            min-width: 0;
         }
 
         .qs-icon-btn {
@@ -166,6 +164,7 @@
             transition: background .2s, color .2s, border-color .2s;
             text-decoration: none;
             font-size: .85rem;
+            flex-shrink: 0;
         }
 
         .qs-icon-btn:hover {
@@ -185,6 +184,7 @@
             cursor: pointer;
             transition: border-color .2s;
             position: relative;
+            min-width: 0;
         }
 
         .qs-user-chip:hover {
@@ -202,6 +202,7 @@
             font-size: .75rem;
             font-weight: 700;
             color: #000;
+            flex-shrink: 0;
         }
 
         .qs-user-name {
@@ -209,6 +210,10 @@
             font-weight: 500;
             color: var(--c-text);
             line-height: 1;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .qs-user-role {
@@ -221,6 +226,7 @@
         .qs-user-caret {
             color: var(--c-muted);
             font-size: .65rem;
+            flex-shrink: 0;
         }
 
         .qs-dropdown {
@@ -261,12 +267,6 @@
             color: var(--c-accent2);
         }
 
-        .qs-dropdown hr {
-            border-color: var(--c-border);
-            margin: 0;
-        }
-
-        /* ─── SIDEBAR ─── */
         .qs-sidebar {
             position: fixed;
             top: var(--nav-h);
@@ -339,18 +339,6 @@
             flex-shrink: 0;
         }
 
-        .sidebar-badge {
-            margin-left: auto;
-            background: var(--c-accent);
-            color: #000;
-            font-size: .62rem;
-            font-weight: 700;
-            padding: .1rem .45rem;
-            border-radius: 20px;
-            font-family: var(--font-head);
-        }
-
-        /* ─── MAIN CONTENT ─── */
         .qs-main {
             margin-left: var(--sidebar-w);
             margin-top: var(--nav-h);
@@ -360,7 +348,12 @@
             z-index: 1;
         }
 
-        /* ─── FLASH MESSAGES ─── */
+        .qs-main.qs-main-full {
+            margin-left: 0;
+            margin-top: 0;
+            min-height: 100vh;
+        }
+
         .qs-alerts {
             margin-bottom: 1.5rem;
         }
@@ -394,7 +387,6 @@
             filter: invert(1) opacity(.5);
         }
 
-        /* ─── MOBILE TOGGLE ─── */
         .qs-mobile-toggle {
             display: none;
             background: none;
@@ -405,15 +397,52 @@
             padding: .25rem;
         }
 
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            z-index: 850;
+        }
+
+        .text-accent {
+            color: var(--c-accent) !important;
+        }
+
+        .text-green {
+            color: var(--c-green) !important;
+        }
+
+        .text-danger2 {
+            color: var(--c-accent2) !important;
+        }
+
+        @media (max-width: 1199px) {
+            .qs-nav {
+                padding: 0 1rem;
+                gap: .75rem;
+            }
+
+            .qs-search {
+                max-width: 250px;
+            }
+
+            .qs-nav-right {
+                gap: .5rem;
+            }
+        }
+
         @media (max-width: 991px) {
             .qs-mobile-toggle {
                 display: flex;
                 align-items: center;
+                justify-content: center;
             }
 
             .qs-sidebar {
                 transform: translateX(-100%);
                 transition: transform .25s ease;
+                width: min(82vw, var(--sidebar-w));
             }
 
             .qs-sidebar.open {
@@ -429,30 +458,88 @@
                 display: none;
             }
 
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                inset: 0;
-                background: rgba(0,0,0,.55);
-                z-index: 850;
-            }
-
             .sidebar-overlay.open {
                 display: block;
             }
         }
 
-        /* ─── UTILITY ─── */
-        .text-accent {
-            color: var(--c-accent) !important;
+        @media (max-width: 767px) {
+            .qs-nav {
+                height: 60px;
+                padding: 0 .75rem;
+            }
+
+            :root {
+                --nav-h: 60px;
+            }
+
+            .qs-brand {
+                font-size: 1rem;
+            }
+
+            .qs-brand-icon {
+                width: 32px;
+                height: 32px;
+            }
+
+            .qs-divider-v {
+                display: none;
+            }
+
+            .qs-icon-btn {
+                display: none;
+            }
+
+            .qs-user-chip {
+                padding: .25rem .45rem .25rem .25rem;
+            }
+
+            .qs-user-name,
+            .qs-user-role,
+            .qs-user-caret {
+                display: none;
+            }
+
+            .qs-avatar {
+                width: 30px;
+                height: 30px;
+            }
+
+            .qs-dropdown {
+                right: 0;
+                min-width: 170px;
+            }
+
+            .qs-main {
+                padding: 1rem .75rem;
+            }
+
+            .page-header {
+                padding: 1.1rem !important;
+            }
+
+            .page-header h1 {
+                font-size: 1.35rem !important;
+            }
+
+            .table-responsive {
+                border-radius: 10px;
+                overflow-x: auto;
+            }
         }
 
-        .text-green {
-            color: var(--c-green) !important;
-        }
+        @media (max-width: 420px) {
+            .qs-brand span {
+                display: none;
+            }
 
-        .text-danger2 {
-            color: var(--c-accent2) !important;
+            .qs-brand-icon {
+                margin-right: 0;
+            }
+
+            .qs-main {
+                padding: .8rem .6rem;
+            }
         }
     </style>
 </head>
@@ -461,9 +548,8 @@
 
 {% if session.user_id %}
 
-<!-- ═══ TOP NAV ═══ -->
 <nav class="qs-nav">
-    <button class="qs-mobile-toggle" id="sidebarToggle" aria-label="Menu">
+    <button class="qs-mobile-toggle" id="sidebarToggle" aria-label="Menú">
         <i class="fas fa-bars"></i>
     </button>
 
@@ -504,16 +590,32 @@
             <i class="fas fa-credit-card"></i>
         </a>
 
-        <a class="qs-icon-btn" href="{{ url_for('reports.sales_report') }}" title="Reportes">
+        <a class="qs-icon-btn" href="{{ url_for('discounts.list_discounts') }}" title="Descuentos">
+            <i class="fas fa-tags"></i>
+        </a>
+
+        <a class="qs-icon-btn" href="{{ url_for('promotions.list_promotions') }}" title="Promociones">
+            <i class="fas fa-gift"></i>
+        </a>
+
+        <a class="qs-icon-btn" href="{{ url_for('reports.sales_report') }}" title="Reporte de Ventas">
+            <i class="fas fa-chart-bar"></i>
+        </a>
+
+        <a class="qs-icon-btn" href="{{ url_for('reports.profit_report') }}" title="Reporte de Utilidad">
             <i class="fas fa-chart-line"></i>
         </a>
 
         <div class="qs-user-chip" id="userChip" tabindex="0">
-            <div class="qs-avatar">{{ session.full_name[0] | upper }}</div>
+            <div class="qs-avatar">
+                {{ session.full_name[0] | upper if session.full_name else 'U' }}
+            </div>
+
             <div>
                 <div class="qs-user-name">{{ session.full_name }}</div>
                 <div class="qs-user-role">{{ session.rol }}</div>
             </div>
+
             <i class="fas fa-chevron-down qs-user-caret ms-1"></i>
 
             <div class="qs-dropdown">
@@ -525,10 +627,8 @@
     </div>
 </nav>
 
-<!-- ═══ SIDEBAR OVERLAY (mobile) ═══ -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- ═══ SIDEBAR ═══ -->
 <aside class="qs-sidebar" id="sidebar">
 
     <div class="sidebar-section-label">Principal</div>
@@ -581,6 +681,14 @@
         <span class="s-icon"><i class="fas fa-credit-card"></i></span> Métodos de Pago
     </a>
 
+    <a class="sidebar-link" href="{{ url_for('discounts.list_discounts') }}">
+        <span class="s-icon"><i class="fas fa-tags"></i></span> Descuentos
+    </a>
+
+    <a class="sidebar-link" href="{{ url_for('promotions.list_promotions') }}">
+        <span class="s-icon"><i class="fas fa-gift"></i></span> Promociones
+    </a>
+
     <a class="sidebar-link" href="{{ url_for('inventory.list_inventory') }}">
         <span class="s-icon"><i class="fas fa-boxes-stacked"></i></span> Inventario
     </a>
@@ -593,16 +701,21 @@
         <span class="s-icon"><i class="fas fa-warehouse"></i></span> Almacén
     </a>
 
+    <div class="sidebar-section-label">Reportes</div>
+
     <a class="sidebar-link" href="{{ url_for('reports.sales_report') }}">
-        <span class="s-icon"><i class="fas fa-chart-line"></i></span> Reportes
+        <span class="s-icon"><i class="fas fa-chart-bar"></i></span> Reporte de Ventas
+    </a>
+
+    <a class="sidebar-link" href="{{ url_for('reports.profit_report') }}">
+        <span class="s-icon"><i class="fas fa-chart-line"></i></span> Reporte de Utilidad
     </a>
 
 </aside>
 
 {% endif %}
 
-<!-- ═══ MAIN CONTENT ═══ -->
-<main class="qs-main">
+<main class="qs-main {% if not session.user_id %}qs-main-full{% endif %}">
 
     <div class="qs-alerts">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -626,50 +739,79 @@
 
 <script>
 (function () {
-    /* ── Sidebar toggle (mobile) ── */
     const sidebar  = document.getElementById('sidebar');
     const overlay  = document.getElementById('sidebarOverlay');
     const toggler  = document.getElementById('sidebarToggle');
 
     function openSidebar() {
-        sidebar.classList.add('open');
-        overlay.classList.add('open');
+        if (sidebar) {
+            sidebar.classList.add('open');
+        }
+
+        if (overlay) {
+            overlay.classList.add('open');
+        }
     }
 
     function closeSidebar() {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('open');
+        if (sidebar) {
+            sidebar.classList.remove('open');
+        }
+
+        if (overlay) {
+            overlay.classList.remove('open');
+        }
     }
 
-    toggler?.addEventListener('click', () =>
-        sidebar.classList.contains('open') ? closeSidebar() : openSidebar()
-    );
+    toggler?.addEventListener('click', function () {
+        if (!sidebar) {
+            return;
+        }
+
+        if (sidebar.classList.contains('open')) {
+            closeSidebar();
+        } else {
+            openSidebar();
+        }
+    });
 
     overlay?.addEventListener('click', closeSidebar);
 
-    /* ── User dropdown ── */
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeSidebar();
+        }
+    });
+
     const chip = document.getElementById('userChip');
 
-    chip?.addEventListener('click', () => chip.classList.toggle('open'));
+    chip?.addEventListener('click', function () {
+        chip.classList.toggle('open');
+    });
 
-    document.addEventListener('click', e => {
-        if (chip && !chip.contains(e.target)) {
+    document.addEventListener('click', function (event) {
+        if (chip && !chip.contains(event.target)) {
             chip.classList.remove('open');
         }
     });
 
-    /* ── Active sidebar link ── */
     const links = document.querySelectorAll('.sidebar-link');
 
-    links.forEach(link => {
+    links.forEach(function (link) {
         const linkPath = new URL(link.href).pathname;
+        const currentPath = window.location.pathname;
 
         if (
             link.href === window.location.href ||
-            window.location.pathname.startsWith(linkPath)
+            currentPath === linkPath ||
+            currentPath.startsWith(linkPath + '/')
         ) {
             link.classList.add('active');
         }
+
+        link.addEventListener('click', function () {
+            closeSidebar();
+        });
     });
 })();
 </script>
