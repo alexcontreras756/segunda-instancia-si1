@@ -339,6 +339,78 @@
             flex-shrink: 0;
         }
 
+        .admin-shortcut-wrap {
+            padding: .85rem 1rem .35rem;
+        }
+
+        .admin-shortcut {
+            display: block;
+            text-decoration: none;
+            border-radius: 16px;
+            padding: 1rem;
+            background:
+                radial-gradient(circle at top right, rgba(245, 166, 35, .22), transparent 35%),
+                linear-gradient(135deg, rgba(245, 166, 35, .16), rgba(232, 55, 74, .08)),
+                var(--c-card);
+            border: 1px solid rgba(245, 166, 35, .28);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .28);
+            transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+        }
+
+        .admin-shortcut:hover {
+            transform: translateY(-2px);
+            border-color: rgba(245, 166, 35, .60);
+            box-shadow: 0 12px 32px rgba(245, 166, 35, .12);
+        }
+
+        .admin-shortcut-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .75rem;
+            margin-bottom: .75rem;
+        }
+
+        .admin-shortcut-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--c-accent);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .95rem;
+            flex-shrink: 0;
+        }
+
+        .admin-shortcut-pill {
+            font-size: .62rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--c-accent);
+            border: 1px solid rgba(245, 166, 35, .35);
+            border-radius: 999px;
+            padding: .22rem .45rem;
+            background: rgba(245, 166, 35, .08);
+        }
+
+        .admin-shortcut-title {
+            color: var(--c-text);
+            font-family: var(--font-head);
+            font-size: .95rem;
+            font-weight: 800;
+            line-height: 1.12;
+            margin-bottom: .25rem;
+        }
+
+        .admin-shortcut-desc {
+            color: var(--c-muted);
+            font-size: .72rem;
+            line-height: 1.25;
+        }
+
         .qs-main {
             margin-left: var(--sidebar-w);
             margin-top: var(--nav-h);
@@ -566,50 +638,6 @@
     </div>
 
     <div class="qs-nav-right">
-        <a class="qs-icon-btn" href="{{ url_for('cash.list_cash') }}" title="Caja">
-            <i class="fas fa-money-bill-wave"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('sales.list_sales') }}" title="Ventas">
-            <i class="fas fa-cash-register"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('purchases.list_purchases') }}" title="Compras">
-            <i class="fas fa-cart-plus"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('inventory.list_inventory') }}" title="Inventario">
-            <i class="fas fa-boxes-stacked"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('output_notes.list_output_notes') }}" title="Nota de Salida">
-            <i class="fas fa-file-export"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('payment_methods.list_payment_methods') }}" title="Métodos de Pago">
-            <i class="fas fa-credit-card"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('discounts.list_discounts') }}" title="Descuentos">
-            <i class="fas fa-tags"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('promotions.list_promotions') }}" title="Promociones">
-            <i class="fas fa-gift"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('reports.sales_report') }}" title="Reporte de Ventas">
-            <i class="fas fa-chart-bar"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('reports.profit_report') }}" title="Reporte de Utilidad">
-            <i class="fas fa-chart-line"></i>
-        </a>
-
-        <a class="qs-icon-btn" href="{{ url_for('voice_ai.voice_ai_page') }}" title="Reporte de Voz IA">
-            <i class="fas fa-microphone-lines"></i>
-        </a>
-
         <div class="qs-user-chip" id="userChip" tabindex="0">
             <div class="qs-avatar">
                 {{ session.full_name[0] | upper if session.full_name else 'U' }}
@@ -644,6 +672,30 @@
     <a class="sidebar-link" href="{{ url_for('attendance.attendance_dashboard') }}">
         <span class="s-icon"><i class="fas fa-clock"></i></span> Bitácora
     </a>
+
+    {% if session.rol == 'admin' %}
+    <div class="sidebar-section-label">Acceso Administrador</div>
+
+    <div class="admin-shortcut-wrap">
+        <a class="admin-shortcut" href="{{ url_for('managerial_dashboard.managerial_dashboard_page') }}">
+            <div class="admin-shortcut-top">
+                <div class="admin-shortcut-icon">
+                    <i class="fas fa-chart-simple"></i>
+                </div>
+
+                <span class="admin-shortcut-pill">Admin</span>
+            </div>
+
+            <div class="admin-shortcut-title">
+                Dashboard Gerencial
+            </div>
+
+            <div class="admin-shortcut-desc">
+                Indicadores, utilidad, ventas y análisis IA.
+            </div>
+        </a>
+    </div>
+    {% endif %}
 
     <div class="sidebar-section-label">Gestión</div>
 
@@ -717,6 +769,10 @@
 
     <a class="sidebar-link" href="{{ url_for('voice_ai.voice_ai_page') }}">
         <span class="s-icon"><i class="fas fa-microphone-lines"></i></span> Reporte de Voz IA
+    </a>
+
+    <a class="sidebar-link" href="{{ url_for('abc_classification.abc_report') }}">
+        <span class="s-icon"><i class="fas fa-layer-group"></i></span> Clasificación ABC
     </a>
 
 </aside>
@@ -803,7 +859,7 @@
         }
     });
 
-    const links = document.querySelectorAll('.sidebar-link');
+    const links = document.querySelectorAll('.sidebar-link, .admin-shortcut');
 
     links.forEach(function (link) {
         const linkPath = new URL(link.href).pathname;

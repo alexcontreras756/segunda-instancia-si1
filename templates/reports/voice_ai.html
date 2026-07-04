@@ -13,12 +13,12 @@
 
 .voice-ai-hero {
     background:
-        radial-gradient(circle at top left, rgba(245, 166, 35, .22), transparent 32%),
-        linear-gradient(135deg, rgba(22, 27, 34, .98), rgba(28, 35, 48, .98));
-    border: 1px solid var(--c-border);
+        radial-gradient(circle at top left, rgba(29, 111, 242, .25), transparent 32%),
+        linear-gradient(135deg, #1d6ff2 0%, #0f5db8 45%, #0d3f73 100%);
+    border: 1px solid rgba(29, 111, 242, .35);
     border-radius: 18px;
     padding: 1.35rem;
-    box-shadow: var(--shadow);
+    box-shadow: 0 12px 28px rgba(29, 111, 242, 0.22);
 }
 
 .voice-ai-hero h1 {
@@ -26,16 +26,16 @@
     font-weight: 800;
     letter-spacing: -.03em;
     margin: 0;
-    color: var(--c-text);
+    color: #ffffff;
 }
 
 .voice-ai-hero h1 span {
-    color: var(--c-accent);
+    color: #ffffff;
 }
 
 .voice-ai-hero p {
     margin: .5rem 0 0;
-    color: var(--c-muted);
+    color: rgba(255, 255, 255, .88);
 }
 
 .voice-ai-card {
@@ -48,18 +48,24 @@
 
 .voice-ai-card-header {
     padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--c-border);
+    border-bottom: 1px solid rgba(29, 111, 242, .22);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: .75rem;
     flex-wrap: wrap;
+    background:
+        linear-gradient(135deg, rgba(29, 111, 242, .16), rgba(13, 63, 115, .08));
 }
 
 .voice-ai-card-header h5 {
     margin: 0;
     font-weight: 700;
     color: var(--c-text);
+}
+
+.voice-ai-card-header h5 i {
+    color: #4ea8ff !important;
 }
 
 .voice-ai-card-body {
@@ -85,8 +91,8 @@
 .voice-ai-question-box textarea:focus {
     background: var(--c-surface);
     color: var(--c-text);
-    border-color: var(--c-accent);
-    box-shadow: 0 0 0 .18rem rgba(245, 166, 35, .16);
+    border-color: #1d6ff2;
+    box-shadow: 0 0 0 .18rem rgba(29, 111, 242, .18);
 }
 
 .voice-ai-btn {
@@ -94,6 +100,29 @@
     font-weight: 700;
     min-height: 44px;
     white-space: nowrap;
+}
+
+.voice-ai-btn-blue {
+    background: linear-gradient(135deg, #1d6ff2 0%, #0f5db8 100%);
+    border: none;
+    color: #ffffff;
+}
+
+.voice-ai-btn-blue:hover {
+    background: linear-gradient(135deg, #2b7cff 0%, #1467c7 100%);
+    color: #ffffff;
+}
+
+.voice-ai-btn-outline-blue {
+    background: rgba(29, 111, 242, .08);
+    border: 1px solid rgba(29, 111, 242, .45);
+    color: #7bb7ff;
+}
+
+.voice-ai-btn-outline-blue:hover {
+    background: rgba(29, 111, 242, .18);
+    border-color: rgba(29, 111, 242, .75);
+    color: #ffffff;
 }
 
 .voice-ai-suggestions {
@@ -104,8 +133,8 @@
 }
 
 .voice-ai-chip {
-    border: 1px solid var(--c-border);
-    background: var(--c-surface);
+    border: 1px solid rgba(29, 111, 242, .28);
+    background: rgba(29, 111, 242, .08);
     color: var(--c-text);
     border-radius: 999px;
     padding: .45rem .75rem;
@@ -115,13 +144,14 @@
 }
 
 .voice-ai-chip:hover {
-    border-color: var(--c-accent);
-    color: var(--c-accent);
+    border-color: #1d6ff2;
+    color: #7bb7ff;
+    background: rgba(29, 111, 242, .16);
 }
 
 .voice-ai-answer {
     background: rgba(13, 17, 23, .55);
-    border: 1px solid var(--c-border);
+    border: 1px solid rgba(29, 111, 242, .22);
     border-radius: 14px;
     padding: 1rem;
     white-space: pre-line;
@@ -131,7 +161,7 @@
 
 .voice-ai-status {
     font-size: .9rem;
-    color: var(--c-muted);
+    color: #9fcaff;
 }
 
 .voice-ai-table {
@@ -153,6 +183,12 @@
     color: var(--c-muted);
     text-align: center;
     padding: 1.25rem;
+}
+
+.voice-ai-info {
+    background: rgba(29, 111, 242, .10);
+    border: 1px solid rgba(29, 111, 242, .25);
+    color: #dcecff;
 }
 
 @media (max-width: 768px) {
@@ -186,7 +222,7 @@
     <div class="voice-ai-card">
         <div class="voice-ai-card-header">
             <h5>
-                <i class="fas fa-robot text-accent"></i>
+                <i class="fas fa-robot"></i>
                 Asistente inteligente de reportes
             </h5>
 
@@ -197,7 +233,7 @@
 
         <div class="voice-ai-card-body">
 
-            <div class="alert alert-info">
+            <div class="alert voice-ai-info">
                 <i class="fas fa-circle-info me-2"></i>
                 Puedes hablar o escribir. Gemini redacta la respuesta, pero los datos salen de PostgreSQL.
             </div>
@@ -209,11 +245,11 @@
                     placeholder="Ej: Muéstrame los productos con stock mínimo"
                 ></textarea>
 
-                <button type="button" class="btn btn-warning voice-ai-btn" id="btnStartVoice">
+                <button type="button" class="btn voice-ai-btn voice-ai-btn-outline-blue" id="btnStartVoice">
                     <i class="fas fa-microphone"></i> Hablar
                 </button>
 
-                <button type="button" class="btn btn-primary voice-ai-btn" id="btnAskAI">
+                <button type="button" class="btn voice-ai-btn voice-ai-btn-blue" id="btnAskAI">
                     <i class="fas fa-paper-plane"></i> Consultar
                 </button>
             </div>
@@ -254,11 +290,11 @@
     <div class="voice-ai-card">
         <div class="voice-ai-card-header">
             <h5>
-                <i class="fas fa-comment-dots text-green"></i>
+                <i class="fas fa-comment-dots"></i>
                 Respuesta de la IA
             </h5>
 
-            <button type="button" class="btn btn-sm btn-outline-warning" id="btnSpeakAnswer">
+            <button type="button" class="btn btn-sm voice-ai-btn-outline-blue" id="btnSpeakAnswer">
                 <i class="fas fa-volume-high"></i> Leer respuesta
             </button>
         </div>
@@ -273,7 +309,7 @@
     <div class="voice-ai-card">
         <div class="voice-ai-card-header">
             <h5>
-                <i class="fas fa-table text-accent"></i>
+                <i class="fas fa-table"></i>
                 Datos encontrados
             </h5>
 

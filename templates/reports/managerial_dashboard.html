@@ -1,0 +1,533 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Gerencial{% endblock %}
+
+{% block content %}
+
+<style>
+.managerial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.managerial-title h1 {
+    font-family: var(--font-head);
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--c-text);
+    margin: 0;
+    letter-spacing: -.03em;
+}
+
+.managerial-title p {
+    color: var(--c-muted);
+    margin: .35rem 0 0;
+    font-size: .95rem;
+}
+
+.managerial-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    border: 1px solid rgba(245, 166, 35, .35);
+    background: rgba(245, 166, 35, .10);
+    color: var(--c-accent);
+    border-radius: 999px;
+    padding: .45rem .8rem;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.managerial-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.managerial-card {
+    background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015)), var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    min-height: 130px;
+    position: relative;
+    overflow: hidden;
+}
+
+.managerial-card::after {
+    content: "";
+    position: absolute;
+    right: -30px;
+    top: -30px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(245, 166, 35, .08);
+}
+
+.managerial-card.danger::after {
+    background: rgba(232, 55, 74, .10);
+}
+
+.managerial-card.success::after {
+    background: rgba(62, 207, 142, .10);
+}
+
+.managerial-card.info::after {
+    background: rgba(78, 168, 222, .10);
+}
+
+.managerial-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(245, 166, 35, .14);
+    color: var(--c-accent);
+    margin-bottom: .85rem;
+    position: relative;
+    z-index: 1;
+}
+
+.managerial-card.danger .managerial-icon {
+    background: rgba(232, 55, 74, .14);
+    color: var(--c-accent2);
+}
+
+.managerial-card.success .managerial-icon {
+    background: rgba(62, 207, 142, .14);
+    color: var(--c-green);
+}
+
+.managerial-card.info .managerial-icon {
+    background: rgba(78, 168, 222, .14);
+    color: #4ea8de;
+}
+
+.managerial-label {
+    color: var(--c-muted);
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-weight: 700;
+    margin-bottom: .35rem;
+    position: relative;
+    z-index: 1;
+}
+
+.managerial-value {
+    color: var(--c-text);
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    position: relative;
+    z-index: 1;
+    word-break: break-word;
+}
+
+.managerial-note {
+    color: var(--c-muted);
+    font-size: .78rem;
+    margin-top: .45rem;
+    position: relative;
+    z-index: 1;
+}
+
+.managerial-panel {
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.managerial-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.managerial-panel-title h2 {
+    font-family: var(--font-head);
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--c-text);
+    margin: 0;
+}
+
+.managerial-panel-title p {
+    color: var(--c-muted);
+    margin: .25rem 0 0;
+    font-size: .85rem;
+}
+
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 360px;
+}
+
+.ai-send-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: linear-gradient(135deg, rgba(245, 166, 35, .12), rgba(232, 55, 74, .08));
+    border: 1px solid rgba(245, 166, 35, .25);
+    border-radius: 18px;
+    padding: 1.25rem;
+}
+
+.ai-send-box h2 {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0 0 .35rem;
+    color: var(--c-text);
+}
+
+.ai-send-box p {
+    color: var(--c-muted);
+    margin: 0;
+    max-width: 700px;
+}
+
+.btn-ai-send {
+    border: 0;
+    border-radius: 12px;
+    background: var(--c-accent);
+    color: #000;
+    font-weight: 800;
+    padding: .75rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    box-shadow: 0 8px 22px rgba(245, 166, 35, .22);
+    transition: transform .15s ease, box-shadow .15s ease;
+    white-space: nowrap;
+}
+
+.btn-ai-send:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(245, 166, 35, .30);
+    color: #000;
+}
+
+.no-sales-message {
+    border: 1px dashed var(--c-border);
+    border-radius: 14px;
+    padding: .9rem 1rem;
+    color: var(--c-muted);
+    background: rgba(255,255,255,.025);
+    margin-top: 1rem;
+}
+
+@media (max-width: 1400px) {
+    .managerial-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .managerial-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .managerial-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .chart-wrapper {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 520px) {
+    .managerial-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .managerial-title h1 {
+        font-size: 1.45rem;
+    }
+
+    .btn-ai-send {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<div class="managerial-header">
+    <div class="managerial-title">
+        <h1>
+            <i class="fas fa-chart-simple me-2"></i>
+            Dashboard Inteligente
+        </h1>
+        <p>Indicadores administrativos del minimarket para toma de decisiones.</p>
+    </div>
+
+    <div class="managerial-badge">
+        <i class="fas fa-user-shield"></i>
+        Acceso solo administrador
+    </div>
+</div>
+
+<div class="managerial-grid">
+    <div class="managerial-card success">
+        <div class="managerial-icon">
+            <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="managerial-label">Ventas del día</div>
+        <div class="managerial-value">{{ indicators.formatted.ventas_dia }}</div>
+        <div class="managerial-note">Facturas activas de hoy</div>
+    </div>
+
+    <div class="managerial-card success">
+        <div class="managerial-icon">
+            <i class="fas fa-calendar-days"></i>
+        </div>
+        <div class="managerial-label">Ventas del mes</div>
+        <div class="managerial-value">{{ indicators.formatted.ventas_mes }}</div>
+        <div class="managerial-note">Mes actual</div>
+    </div>
+
+    <div class="managerial-card info">
+        <div class="managerial-icon">
+            <i class="fas fa-sack-dollar"></i>
+        </div>
+        <div class="managerial-label">Utilidad del mes</div>
+        <div class="managerial-value">{{ indicators.formatted.utilidad_mes }}</div>
+        <div class="managerial-note">Total cobrado menos costo</div>
+    </div>
+
+    <div class="managerial-card danger">
+        <div class="managerial-icon">
+            <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <div class="managerial-label">Stock bajo</div>
+        <div class="managerial-value">{{ indicators.productos_stock_bajo }}</div>
+        <div class="managerial-note">Productos bajo mínimo</div>
+    </div>
+
+    <div class="managerial-card danger">
+        <div class="managerial-icon">
+            <i class="fas fa-box-open"></i>
+        </div>
+        <div class="managerial-label">Agotados</div>
+        <div class="managerial-value">{{ indicators.productos_agotados }}</div>
+        <div class="managerial-note">Productos sin stock</div>
+    </div>
+
+    <div class="managerial-card danger">
+        <div class="managerial-icon">
+            <i class="fas fa-hourglass-half"></i>
+        </div>
+        <div class="managerial-label">Próximos a vencer</div>
+        <div class="managerial-value">{{ indicators.productos_proximos_vencer }}</div>
+        <div class="managerial-note">Próximos 30 días</div>
+    </div>
+
+    <div class="managerial-card info">
+        <div class="managerial-icon">
+            <i class="fas fa-cart-plus"></i>
+        </div>
+        <div class="managerial-label">Compras del mes</div>
+        <div class="managerial-value">{{ indicators.formatted.compras_mes }}</div>
+        <div class="managerial-note">Notas de compra activas</div>
+    </div>
+
+    <div class="managerial-card danger">
+        <div class="managerial-icon">
+            <i class="fas fa-file-export"></i>
+        </div>
+        <div class="managerial-label">Pérdidas por salida</div>
+        <div class="managerial-value">{{ indicators.formatted.perdidas_notas_salida }}</div>
+        <div class="managerial-note">Notas de salida activas</div>
+    </div>
+
+    <div class="managerial-card">
+        <div class="managerial-icon">
+            <i class="fas fa-cash-register"></i>
+        </div>
+        <div class="managerial-label">Cajas abiertas</div>
+        <div class="managerial-value">{{ indicators.cajas_abiertas }}</div>
+        <div class="managerial-note">Pendientes de cierre</div>
+    </div>
+
+    <div class="managerial-card">
+        <div class="managerial-icon">
+            <i class="fas fa-credit-card"></i>
+        </div>
+        <div class="managerial-label">Método más usado</div>
+        <div class="managerial-value">{{ indicators.metodo_pago_mas_usado.metodo_pago }}</div>
+        <div class="managerial-note">
+            {{ indicators.metodo_pago_mas_usado.cantidad }} uso(s) · {{ indicators.formatted.metodo_pago_total }}
+        </div>
+    </div>
+</div>
+
+<div class="managerial-panel">
+    <div class="managerial-panel-header">
+        <div class="managerial-panel-title">
+            <h2>
+                <i class="fas fa-chart-column me-2"></i>
+                Ventas por día del mes actual
+            </h2>
+            <p>Gráfica de barras con el total vendido por día.</p>
+        </div>
+    </div>
+
+    <div class="chart-wrapper">
+        <canvas
+            id="salesByDayChart"
+            data-labels='{{ chart_labels | tojson | safe }}'
+            data-values='{{ chart_values | tojson | safe }}'>
+        </canvas>
+    </div>
+
+    {% if not has_month_sales %}
+    <div class="no-sales-message">
+        <i class="fas fa-info-circle me-2"></i>
+        No existen ventas registradas en el mes actual.
+    </div>
+    {% endif %}
+</div>
+
+<div class="ai-send-box">
+    <div>
+        <h2>
+            <i class="fas fa-brain me-2"></i>
+            Análisis gerencial con IA
+        </h2>
+        <p>
+            Genera un análisis administrativo con Gemini IA usando estos indicadores reales
+            y envíalo al correo configurado del administrador.
+        </p>
+    </div>
+
+    <form method="POST" action="{{ url_for('managerial_dashboard.send_ai_email') }}">
+        <button type="submit" class="btn-ai-send">
+            <i class="fas fa-paper-plane"></i>
+            Enviar análisis gerencial IA por correo
+        </button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var canvas = document.getElementById("salesByDayChart");
+
+    if (!canvas) {
+        return;
+    }
+
+    var labels = [];
+    var values = [];
+
+    try {
+        labels = JSON.parse(canvas.getAttribute("data-labels") || "[]");
+        values = JSON.parse(canvas.getAttribute("data-values") || "[]");
+    } catch (error) {
+        labels = [];
+        values = [];
+    }
+
+    var context = canvas.getContext("2d");
+
+    if (!context) {
+        return;
+    }
+
+    new Chart(context, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Ventas del día (Bs)",
+                    data: values,
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    maxBarThickness: 34
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "#e6edf3",
+                        font: {
+                            family: "DM Sans"
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            var value = Number(context.raw || 0).toFixed(2);
+                            return "Bs " + value;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: "Día del mes",
+                        color: "#7d8fa3"
+                    },
+                    ticks: {
+                        color: "#7d8fa3"
+                    },
+                    grid: {
+                        color: "rgba(125, 143, 163, 0.12)"
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: "Total vendido (Bs)",
+                        color: "#7d8fa3"
+                    },
+                    ticks: {
+                        color: "#7d8fa3",
+                        callback: function (value) {
+                            return "Bs " + value;
+                        }
+                    },
+                    grid: {
+                        color: "rgba(125, 143, 163, 0.12)"
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+
+{% endblock %}

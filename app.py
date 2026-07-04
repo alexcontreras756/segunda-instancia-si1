@@ -37,6 +37,8 @@ from controllers.discount_controller import discount_bp
 from controllers.promotion_controller import promotion_bp
 from controllers.report_controller import report_bp
 from controllers.voice_ai_controller import voice_ai_bp
+from controllers.managerial_dashboard_controller import managerial_dashboard_bp
+from controllers.abc_classification_controller import abc_classification_bp
 
 
 app = Flask(__name__)
@@ -86,6 +88,8 @@ app.register_blueprint(discount_bp)
 app.register_blueprint(promotion_bp)
 app.register_blueprint(report_bp)
 app.register_blueprint(voice_ai_bp)
+app.register_blueprint(managerial_dashboard_bp)
+app.register_blueprint(abc_classification_bp)
 
 
 # Rutas principales
@@ -136,11 +140,16 @@ def dashboard():
     # para no crear permisos nuevos ni tocar la base de datos.
     can_view_voice_ai_report = can_view_sales_report
 
+    # Clasificación ABC usará el mismo permiso base del Reporte de Utilidad
+    # para no crear permisos nuevos ni tocar la base de datos.
+    can_view_abc_classification = can_view_profit_report
+
     # Permiso general para mostrar el bloque de Reportes
     can_view_reports = (
         can_view_sales_report
         or can_view_profit_report
         or can_view_voice_ai_report
+        or can_view_abc_classification
     )
 
     stats = {}
@@ -214,6 +223,9 @@ def dashboard():
         if can_view_voice_ai_report:
             reports_count += 1
 
+        if can_view_abc_classification:
+            reports_count += 1
+
         stats['reports'] = reports_count
 
     # Diccionario con permisos para mostrar los bloques correspondientes
@@ -238,7 +250,8 @@ def dashboard():
         'can_view_reports': can_view_reports,
         'can_view_sales_report': can_view_sales_report,
         'can_view_profit_report': can_view_profit_report,
-        'can_view_voice_ai_report': can_view_voice_ai_report
+        'can_view_voice_ai_report': can_view_voice_ai_report,
+        'can_view_abc_classification': can_view_abc_classification
     }
 
     return render_template(

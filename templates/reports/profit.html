@@ -6,12 +6,12 @@
 
 <style>
     .profit-header {
-        background: linear-gradient(135deg, #14532d, #0f172a);
+        background: linear-gradient(135deg, #1d6ff2 0%, #0f5db8 45%, #0d3f73 100%);
         color: white;
         border-radius: 18px;
         padding: 24px;
         margin-bottom: 24px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+        box-shadow: 0 12px 28px rgba(29, 111, 242, 0.22);
     }
 
     .profit-header h1 {
@@ -29,6 +29,12 @@
         border-radius: 18px;
         box-shadow: 0 6px 16px rgba(0,0,0,0.08);
         overflow: hidden;
+    }
+
+    .profit-card-header-blue {
+        background: linear-gradient(135deg, #1d6ff2 0%, #0f5db8 55%, #0d3f73 100%);
+        color: white;
+        border: none;
     }
 
     .profit-stat {
@@ -87,7 +93,7 @@
 </style>
 
 <div class="profit-header">
-    <h1><i class="fas fa-chart-line"></i> CU17 - Reporte de Utilidad</h1>
+    <h1><i class="fas fa-chart-line"></i> Reporte de Utilidad</h1>
     <p>
         Calcula la ganancia real usando ventas cobradas, costo de productos vendidos,
         descuentos y promociones ya reflejados en el monto final.
@@ -95,7 +101,7 @@
 </div>
 
 <div class="card profit-card mb-4">
-    <div class="card-header bg-dark text-white">
+    <div class="card-header profit-card-header-blue">
         <h5 class="mb-0">
             <i class="fas fa-filter"></i> Filtros del reporte
         </h5>
@@ -293,7 +299,7 @@
 
     <div class="col-md-6 mb-3">
         <div class="card profit-card">
-            <div class="card-header bg-success text-white">
+            <div class="card-header profit-card-header-blue">
                 <h5 class="mb-0">
                     <i class="fas fa-user-tie"></i> Resumen por cajero
                 </h5>
@@ -351,7 +357,7 @@
 
     <div class="col-md-6 mb-3">
         <div class="card profit-card">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header profit-card-header-blue">
                 <h5 class="mb-0">
                     <i class="fas fa-credit-card"></i> Resumen por tipo de pago
                 </h5>
@@ -406,7 +412,7 @@
 </div>
 
 <div class="card profit-card">
-    <div class="card-header bg-dark text-white">
+    <div class="card-header profit-card-header-blue">
         <h5 class="mb-0">
             <i class="fas fa-table"></i> Detalle de utilidad por factura
         </h5>
