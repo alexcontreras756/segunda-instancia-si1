@@ -5,154 +5,206 @@
 {% block content %}
 
 <style>
-.managerial-header {
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+/* ===== Topbar ===== */
+.dash-topbar {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
     gap: 1rem;
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
 }
 
-.managerial-title h1 {
+.dash-eyebrow {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--c-accent);
+    margin-bottom: .4rem;
+}
+
+.dash-titleblock h1 {
     font-family: var(--font-head);
-    font-size: 1.85rem;
+    font-size: 1.9rem;
     font-weight: 800;
     color: var(--c-text);
     margin: 0;
     letter-spacing: -.03em;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
 }
 
-.managerial-title p {
+.dash-titleblock p {
     color: var(--c-muted);
-    margin: .35rem 0 0;
+    margin: .4rem 0 0;
     font-size: .95rem;
 }
 
-.managerial-badge {
+.dash-access-chip {
     display: inline-flex;
     align-items: center;
     gap: .5rem;
-    border: 1px solid rgba(245, 166, 35, .35);
-    background: rgba(245, 166, 35, .10);
+    border: 1px solid color-mix(in srgb, var(--c-accent) 40%, transparent);
+    background: color-mix(in srgb, var(--c-accent) 12%, transparent);
     color: var(--c-accent);
     border-radius: 999px;
-    padding: .45rem .8rem;
-    font-size: .82rem;
+    padding: .5rem .9rem;
+    font-size: .8rem;
     font-weight: 700;
+    white-space: nowrap;
 }
 
-.managerial-grid {
+/* ===== KPI sections (ticket / receipt motif) ===== */
+.kpi-section {
+    margin-bottom: 1.6rem;
+}
+
+.kpi-section-head {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: .85rem;
+}
+
+.kpi-section-head i {
+    color: var(--c-accent);
+    font-size: .95rem;
+}
+
+.kpi-section-head span {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: .82rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    white-space: nowrap;
+}
+
+.kpi-section-head .perforation {
+    flex: 1;
+    height: 0;
+    border-top: 1.5px dashed var(--c-border);
+}
+
+.kpi-row {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1rem;
-    margin-bottom: 1.5rem;
 }
 
-.managerial-card {
-    background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015)), var(--c-card);
-    border: 1px solid var(--c-border);
-    border-radius: 16px;
-    padding: 1rem;
-    box-shadow: var(--shadow);
-    min-height: 130px;
+.kpi-row.kpi-row-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ticket-card {
     position: relative;
-    overflow: hidden;
+    background: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)), var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 14px;
+    padding: 1rem 1.1rem 1.15rem;
+    box-shadow: var(--shadow);
 }
 
-.managerial-card::after {
+.ticket-card::before {
     content: "";
     position: absolute;
-    right: -30px;
-    top: -30px;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: rgba(245, 166, 35, .08);
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 14px 14px 0 0;
+    background: var(--c-border);
 }
 
-.managerial-card.danger::after {
-    background: rgba(232, 55, 74, .10);
+.ticket-card.success::before { background: var(--c-green); }
+.ticket-card.info::before    { background: #4ea8de; }
+.ticket-card.danger::before  { background: var(--c-accent2); }
+.ticket-card.neutral::before { background: var(--c-accent); }
+
+.ticket-top {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    margin-bottom: .7rem;
 }
 
-.managerial-card.success::after {
-    background: rgba(62, 207, 142, .10);
-}
-
-.managerial-card.info::after {
-    background: rgba(78, 168, 222, .10);
-}
-
-.managerial-icon {
-    width: 42px;
-    height: 42px;
+.ticket-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    background: rgba(245, 166, 35, .14);
-    color: var(--c-accent);
-    margin-bottom: .85rem;
-    position: relative;
-    z-index: 1;
-}
-
-.managerial-card.danger .managerial-icon {
-    background: rgba(232, 55, 74, .14);
-    color: var(--c-accent2);
-}
-
-.managerial-card.success .managerial-icon {
-    background: rgba(62, 207, 142, .14);
-    color: var(--c-green);
-}
-
-.managerial-card.info .managerial-icon {
-    background: rgba(78, 168, 222, .14);
-    color: #4ea8de;
-}
-
-.managerial-label {
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--c-border) 60%, transparent);
     color: var(--c-muted);
-    font-size: .78rem;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    font-weight: 700;
-    margin-bottom: .35rem;
-    position: relative;
-    z-index: 1;
+    font-size: .85rem;
 }
 
-.managerial-value {
+.ticket-card.success .ticket-icon { background: color-mix(in srgb, var(--c-green) 16%, transparent); color: var(--c-green); }
+.ticket-card.info .ticket-icon    { background: color-mix(in srgb, #4ea8de 16%, transparent); color: #4ea8de; }
+.ticket-card.danger .ticket-icon  { background: color-mix(in srgb, var(--c-accent2) 16%, transparent); color: var(--c-accent2); }
+.ticket-card.neutral .ticket-icon { background: color-mix(in srgb, var(--c-accent) 16%, transparent); color: var(--c-accent); }
+
+.ticket-label {
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--c-muted);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    line-height: 1.15;
+}
+
+.ticket-tear {
+    height: 0;
+    border-top: 1.5px dashed var(--c-border);
+    margin: 0 -0.2rem .7rem;
+}
+
+.ticket-value {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    font-size: 1.3rem;
     color: var(--c-text);
-    font-family: var(--font-head);
-    font-weight: 800;
-    font-size: 1.25rem;
-    letter-spacing: -.02em;
-    line-height: 1.1;
-    position: relative;
-    z-index: 1;
+    line-height: 1.15;
     word-break: break-word;
 }
 
-.managerial-note {
+.ticket-note {
     color: var(--c-muted);
-    font-size: .78rem;
-    margin-top: .45rem;
-    position: relative;
-    z-index: 1;
+    font-size: .76rem;
+    margin-top: .4rem;
 }
 
-.managerial-panel {
+@media (max-width: 1200px) {
+    .kpi-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 860px) {
+    .kpi-row, .kpi-row.kpi-row-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+    .kpi-row, .kpi-row.kpi-row-2 { grid-template-columns: 1fr; }
+    .dash-titleblock h1 { font-size: 1.5rem; }
+}
+
+/* ===== Chart panel ===== */
+.dash-panel {
     background: var(--c-card);
     border: 1px solid var(--c-border);
     border-radius: 18px;
     box-shadow: var(--shadow);
     padding: 1.25rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.6rem;
 }
 
-.managerial-panel-header {
+.dash-panel-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -161,15 +213,18 @@
     margin-bottom: 1rem;
 }
 
-.managerial-panel-title h2 {
+.dash-panel-head h2 {
     font-family: var(--font-head);
     font-size: 1.15rem;
     font-weight: 800;
     color: var(--c-text);
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
 }
 
-.managerial-panel-title p {
+.dash-panel-head p {
     color: var(--c-muted);
     margin: .25rem 0 0;
     font-size: .85rem;
@@ -181,30 +236,180 @@
     min-height: 360px;
 }
 
-.ai-send-box {
+.no-sales-message {
+    border: 1px dashed var(--c-border);
+    border-radius: 14px;
+    padding: .9rem 1rem;
+    color: var(--c-muted);
+    background: rgba(255,255,255,.025);
+    margin-top: 1rem;
+    font-size: .9rem;
+}
+
+/* ===== Export panel ===== */
+.export-panel {
+    background: var(--c-card);
+    border: 1px solid var(--c-border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 1.25rem 1.35rem;
+    margin-bottom: 1.6rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
-    background: linear-gradient(135deg, rgba(245, 166, 35, .12), rgba(232, 55, 74, .08));
-    border: 1px solid rgba(245, 166, 35, .25);
+}
+
+.export-copy {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    max-width: 680px;
+}
+
+.export-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, #4ea8de 18%, transparent);
+    color: #4ea8de;
+    font-size: 1.05rem;
+}
+
+.export-copy h2 {
+    font-family: var(--font-head);
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0 0 .3rem;
+    color: var(--c-text);
+}
+
+.export-copy p {
+    color: var(--c-muted);
+    margin: 0;
+    font-size: .88rem;
+}
+
+.export-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+}
+
+.btn-export {
+    border-radius: 12px;
+    font-weight: 800;
+    padding: .72rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.btn-export:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.btn-export-pdf {
+    background: rgba(232, 55, 74, .12);
+    border: 1px solid rgba(232, 55, 74, .38);
+    color: #ff7b8a;
+}
+
+.btn-export-pdf:hover {
+    background: rgba(232, 55, 74, .20);
+    border-color: rgba(232, 55, 74, .70);
+    color: #ffffff;
+}
+
+.btn-export-excel {
+    background: rgba(62, 207, 142, .12);
+    border: 1px solid rgba(62, 207, 142, .38);
+    color: #63e6a8;
+}
+
+.btn-export-excel:hover {
+    background: rgba(62, 207, 142, .20);
+    border-color: rgba(62, 207, 142, .70);
+    color: #ffffff;
+}
+
+.btn-export-html {
+    background: rgba(78, 168, 222, .12);
+    border: 1px solid rgba(78, 168, 222, .38);
+    color: #7cc8ff;
+}
+
+.btn-export-html:hover {
+    background: rgba(78, 168, 222, .20);
+    border-color: rgba(78, 168, 222, .70);
+    color: #ffffff;
+}
+
+/* ===== AI send panel (thermal-printer motif) ===== */
+.ai-send-box {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--c-accent) 14%, transparent), color-mix(in srgb, var(--c-accent2) 8%, transparent)), var(--c-card);
+    border: 1px solid color-mix(in srgb, var(--c-accent) 30%, var(--c-border));
     border-radius: 18px;
-    padding: 1.25rem;
+    padding: 1.3rem 1.4rem;
+    overflow: hidden;
+}
+
+.ai-send-box::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: repeating-linear-gradient(90deg, var(--c-accent) 0 10px, transparent 10px 18px);
+    opacity: .55;
+}
+
+.ai-send-copy {
+    display: flex;
+    align-items: flex-start;
+    gap: .8rem;
+    max-width: 640px;
+}
+
+.ai-send-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: color-mix(in srgb, var(--c-accent) 18%, transparent);
+    color: var(--c-accent);
+    font-size: 1.05rem;
 }
 
 .ai-send-box h2 {
     font-family: var(--font-head);
     font-size: 1.1rem;
     font-weight: 800;
-    margin: 0 0 .35rem;
+    margin: 0 0 .3rem;
     color: var(--c-text);
 }
 
 .ai-send-box p {
     color: var(--c-muted);
     margin: 0;
-    max-width: 700px;
+    font-size: .88rem;
 }
 
 .btn-ai-send {
@@ -213,184 +418,195 @@
     background: var(--c-accent);
     color: #000;
     font-weight: 800;
-    padding: .75rem 1rem;
+    padding: .75rem 1.05rem;
     display: inline-flex;
     align-items: center;
     gap: .55rem;
-    box-shadow: 0 8px 22px rgba(245, 166, 35, .22);
+    box-shadow: 0 8px 22px color-mix(in srgb, var(--c-accent) 35%, transparent);
     transition: transform .15s ease, box-shadow .15s ease;
     white-space: nowrap;
 }
 
 .btn-ai-send:hover {
     transform: translateY(-1px);
-    box-shadow: 0 12px 28px rgba(245, 166, 35, .30);
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--c-accent) 45%, transparent);
     color: #000;
 }
 
-.no-sales-message {
-    border: 1px dashed var(--c-border);
-    border-radius: 14px;
-    padding: .9rem 1rem;
-    color: var(--c-muted);
-    background: rgba(255,255,255,.025);
-    margin-top: 1rem;
-}
-
-@media (max-width: 1400px) {
-    .managerial-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 1100px) {
-    .managerial-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .managerial-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .chart-wrapper {
-        min-height: 300px;
-    }
-}
-
-@media (max-width: 520px) {
-    .managerial-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .managerial-title h1 {
-        font-size: 1.45rem;
-    }
-
+@media (max-width: 640px) {
     .btn-ai-send {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ai-send-box {
+        padding: 1.2rem;
+    }
+
+    .export-panel {
+        padding: 1.2rem;
+    }
+
+    .export-actions {
+        width: 100%;
+    }
+
+    .btn-export {
         width: 100%;
         justify-content: center;
     }
 }
 </style>
 
-<div class="managerial-header">
-    <div class="managerial-title">
-        <h1>
-            <i class="fas fa-chart-simple me-2"></i>
-            Dashboard Inteligente
-        </h1>
+<div class="dash-topbar">
+    <div class="dash-titleblock">
+        <span class="dash-eyebrow">Panel gerencial · Minimarket</span>
+        <h1><i class="fas fa-chart-simple"></i> Dashboard Inteligente</h1>
         <p>Indicadores administrativos del minimarket para toma de decisiones.</p>
     </div>
 
-    <div class="managerial-badge">
+    <div class="dash-access-chip">
         <i class="fas fa-user-shield"></i>
         Acceso solo administrador
     </div>
 </div>
 
-<div class="managerial-grid">
-    <div class="managerial-card success">
-        <div class="managerial-icon">
-            <i class="fas fa-calendar-day"></i>
-        </div>
-        <div class="managerial-label">Ventas del día</div>
-        <div class="managerial-value">{{ indicators.formatted.ventas_dia }}</div>
-        <div class="managerial-note">Facturas activas de hoy</div>
+<section class="kpi-section">
+    <div class="kpi-section-head">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <span>Ventas &amp; utilidad</span>
+        <div class="perforation"></div>
     </div>
 
-    <div class="managerial-card success">
-        <div class="managerial-icon">
-            <i class="fas fa-calendar-days"></i>
-        </div>
-        <div class="managerial-label">Ventas del mes</div>
-        <div class="managerial-value">{{ indicators.formatted.ventas_mes }}</div>
-        <div class="managerial-note">Mes actual</div>
+    <div class="kpi-row">
+        <article class="ticket-card success">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-calendar-day"></i></span>
+                <span class="ticket-label">Ventas del día</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.formatted.ventas_dia }}</div>
+            <div class="ticket-note">Facturas activas de hoy</div>
+        </article>
+
+        <article class="ticket-card success">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-calendar-days"></i></span>
+                <span class="ticket-label">Ventas del mes</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.formatted.ventas_mes }}</div>
+            <div class="ticket-note">Mes actual</div>
+        </article>
+
+        <article class="ticket-card info">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-sack-dollar"></i></span>
+                <span class="ticket-label">Utilidad del mes</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.formatted.utilidad_mes }}</div>
+            <div class="ticket-note">Total cobrado menos costo</div>
+        </article>
+
+        <article class="ticket-card info">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-cart-plus"></i></span>
+                <span class="ticket-label">Compras del mes</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.formatted.compras_mes }}</div>
+            <div class="ticket-note">Notas de compra activas</div>
+        </article>
+    </div>
+</section>
+
+<section class="kpi-section">
+    <div class="kpi-section-head">
+        <i class="fas fa-boxes-stacked"></i>
+        <span>Inventario &amp; alertas</span>
+        <div class="perforation"></div>
     </div>
 
-    <div class="managerial-card info">
-        <div class="managerial-icon">
-            <i class="fas fa-sack-dollar"></i>
-        </div>
-        <div class="managerial-label">Utilidad del mes</div>
-        <div class="managerial-value">{{ indicators.formatted.utilidad_mes }}</div>
-        <div class="managerial-note">Total cobrado menos costo</div>
+    <div class="kpi-row">
+        <article class="ticket-card danger">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                <span class="ticket-label">Stock bajo</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.productos_stock_bajo }}</div>
+            <div class="ticket-note">Productos bajo mínimo</div>
+        </article>
+
+        <article class="ticket-card danger">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-box-open"></i></span>
+                <span class="ticket-label">Agotados</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.productos_agotados }}</div>
+            <div class="ticket-note">Productos sin stock</div>
+        </article>
+
+        <article class="ticket-card danger">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-hourglass-half"></i></span>
+                <span class="ticket-label">Próximos a vencer</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.productos_proximos_vencer }}</div>
+            <div class="ticket-note">Próximos 30 días</div>
+        </article>
+
+        <article class="ticket-card danger">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-file-export"></i></span>
+                <span class="ticket-label">Pérdidas por salida</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.formatted.perdidas_notas_salida }}</div>
+            <div class="ticket-note">Notas de salida activas</div>
+        </article>
+    </div>
+</section>
+
+<section class="kpi-section">
+    <div class="kpi-section-head">
+        <i class="fas fa-cash-register"></i>
+        <span>Operación &amp; caja</span>
+        <div class="perforation"></div>
     </div>
 
-    <div class="managerial-card danger">
-        <div class="managerial-icon">
-            <i class="fas fa-triangle-exclamation"></i>
-        </div>
-        <div class="managerial-label">Stock bajo</div>
-        <div class="managerial-value">{{ indicators.productos_stock_bajo }}</div>
-        <div class="managerial-note">Productos bajo mínimo</div>
-    </div>
+    <div class="kpi-row kpi-row-2">
+        <article class="ticket-card neutral">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-cash-register"></i></span>
+                <span class="ticket-label">Cajas abiertas</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.cajas_abiertas }}</div>
+            <div class="ticket-note">Pendientes de cierre</div>
+        </article>
 
-    <div class="managerial-card danger">
-        <div class="managerial-icon">
-            <i class="fas fa-box-open"></i>
-        </div>
-        <div class="managerial-label">Agotados</div>
-        <div class="managerial-value">{{ indicators.productos_agotados }}</div>
-        <div class="managerial-note">Productos sin stock</div>
+        <article class="ticket-card neutral">
+            <div class="ticket-top">
+                <span class="ticket-icon"><i class="fas fa-credit-card"></i></span>
+                <span class="ticket-label">Método más usado</span>
+            </div>
+            <div class="ticket-tear"></div>
+            <div class="ticket-value">{{ indicators.metodo_pago_mas_usado.metodo_pago }}</div>
+            <div class="ticket-note">
+                {{ indicators.metodo_pago_mas_usado.cantidad }} uso(s) · {{ indicators.formatted.metodo_pago_total }}
+            </div>
+        </article>
     </div>
+</section>
 
-    <div class="managerial-card danger">
-        <div class="managerial-icon">
-            <i class="fas fa-hourglass-half"></i>
-        </div>
-        <div class="managerial-label">Próximos a vencer</div>
-        <div class="managerial-value">{{ indicators.productos_proximos_vencer }}</div>
-        <div class="managerial-note">Próximos 30 días</div>
-    </div>
-
-    <div class="managerial-card info">
-        <div class="managerial-icon">
-            <i class="fas fa-cart-plus"></i>
-        </div>
-        <div class="managerial-label">Compras del mes</div>
-        <div class="managerial-value">{{ indicators.formatted.compras_mes }}</div>
-        <div class="managerial-note">Notas de compra activas</div>
-    </div>
-
-    <div class="managerial-card danger">
-        <div class="managerial-icon">
-            <i class="fas fa-file-export"></i>
-        </div>
-        <div class="managerial-label">Pérdidas por salida</div>
-        <div class="managerial-value">{{ indicators.formatted.perdidas_notas_salida }}</div>
-        <div class="managerial-note">Notas de salida activas</div>
-    </div>
-
-    <div class="managerial-card">
-        <div class="managerial-icon">
-            <i class="fas fa-cash-register"></i>
-        </div>
-        <div class="managerial-label">Cajas abiertas</div>
-        <div class="managerial-value">{{ indicators.cajas_abiertas }}</div>
-        <div class="managerial-note">Pendientes de cierre</div>
-    </div>
-
-    <div class="managerial-card">
-        <div class="managerial-icon">
-            <i class="fas fa-credit-card"></i>
-        </div>
-        <div class="managerial-label">Método más usado</div>
-        <div class="managerial-value">{{ indicators.metodo_pago_mas_usado.metodo_pago }}</div>
-        <div class="managerial-note">
-            {{ indicators.metodo_pago_mas_usado.cantidad }} uso(s) · {{ indicators.formatted.metodo_pago_total }}
-        </div>
-    </div>
-</div>
-
-<div class="managerial-panel">
-    <div class="managerial-panel-header">
-        <div class="managerial-panel-title">
-            <h2>
-                <i class="fas fa-chart-column me-2"></i>
-                Ventas por día del mes actual
-            </h2>
+<div class="dash-panel">
+    <div class="dash-panel-head">
+        <div>
+            <h2><i class="fas fa-chart-column"></i> Ventas por día del mes actual</h2>
             <p>Gráfica de barras con el total vendido por día.</p>
         </div>
     </div>
@@ -411,22 +627,52 @@
     {% endif %}
 </div>
 
+<div class="export-panel">
+    <div class="export-copy">
+        <span class="export-icon"><i class="fas fa-download"></i></span>
+        <div>
+            <h2>Descargar reporte</h2>
+            <p>
+                Exporta los indicadores y la información del panel en formato PDF,
+                Excel o HTML para respaldo, revisión o presentación administrativa.
+            </p>
+        </div>
+    </div>
+
+    <div class="export-actions">
+        <a href="/reports/managerial-dashboard/pdf" class="btn-export btn-export-pdf">
+            <i class="fas fa-file-pdf"></i>
+            Descargar PDF
+        </a>
+
+        <a href="/reports/managerial-dashboard/excel" class="btn-export btn-export-excel">
+            <i class="fas fa-file-excel"></i>
+            Descargar Excel
+        </a>
+
+        <a href="/reports/managerial-dashboard/html" class="btn-export btn-export-html">
+            <i class="fas fa-file-code"></i>
+            Descargar HTML
+        </a>
+    </div>
+</div>
+
 <div class="ai-send-box">
-    <div>
-        <h2>
-            <i class="fas fa-brain me-2"></i>
-            Análisis gerencial con IA
-        </h2>
-        <p>
-            Genera un análisis administrativo con Gemini IA usando estos indicadores reales
-            y envíalo al correo configurado del administrador.
-        </p>
+    <div class="ai-send-copy">
+        <span class="ai-send-icon"><i class="fas fa-brain"></i></span>
+        <div>
+            <h2>Análisis con IA</h2>
+            <p>
+                Genera un análisis administrativo con Gemini IA usando estos indicadores reales
+                y envíalo al correo configurado del administrador.
+            </p>
+        </div>
     </div>
 
     <form method="POST" action="{{ url_for('managerial_dashboard.send_ai_email') }}">
         <button type="submit" class="btn-ai-send">
             <i class="fas fa-paper-plane"></i>
-            Enviar análisis gerencial IA por correo
+            Enviar análisis de IA por correo
         </button>
     </form>
 </div>

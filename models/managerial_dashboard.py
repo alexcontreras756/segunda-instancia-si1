@@ -30,7 +30,7 @@ class ManagerialDashboard:
     @staticmethod
     def _format_money(value):
         """
-        Formatear importes para mostrar en plantillas y correos.
+        Formatear importes para mostrar en plantillas, correos y exportaciones.
         """
         value = ManagerialDashboard._to_decimal(value)
         return f'Bs {value:.2f}'
@@ -375,6 +375,113 @@ class ManagerialDashboard:
             'chart_labels': [str(item['day']) for item in sales_by_day],
             'chart_values': [item['total'] for item in sales_by_day],
             'has_month_sales': has_month_sales
+        }
+
+    @staticmethod
+    def get_indicator_export_rows(indicators=None):
+        """
+        Devuelve los indicadores en formato de filas para exportar en PDF, Excel o HTML.
+        """
+        if indicators is None:
+            indicators = ManagerialDashboard.get_indicators()
+
+        formatted = indicators.get('formatted', {})
+        payment_method = indicators.get('metodo_pago_mas_usado', {})
+
+        return [
+            {
+                'indicador': 'Ventas del día',
+                'valor': formatted.get('ventas_dia', 'Bs 0.00')
+            },
+            {
+                'indicador': 'Ventas del mes',
+                'valor': formatted.get('ventas_mes', 'Bs 0.00')
+            },
+            {
+                'indicador': 'Utilidad del mes',
+                'valor': formatted.get('utilidad_mes', 'Bs 0.00')
+            },
+            {
+                'indicador': 'Productos con stock bajo',
+                'valor': indicators.get('productos_stock_bajo', 0)
+            },
+            {
+                'indicador': 'Productos agotados',
+                'valor': indicators.get('productos_agotados', 0)
+            },
+            {
+                'indicador': 'Productos próximos a vencer',
+                'valor': indicators.get('productos_proximos_vencer', 0)
+            },
+            {
+                'indicador': 'Compras del mes',
+                'valor': formatted.get('compras_mes', 'Bs 0.00')
+            },
+            {
+                'indicador': 'Pérdidas por notas de salida',
+                'valor': formatted.get('perdidas_notas_salida', 'Bs 0.00')
+            },
+            {
+                'indicador': 'Cajas abiertas',
+                'valor': indicators.get('cajas_abiertas', 0)
+            },
+            {
+                'indicador': 'Método de pago más usado',
+                'valor': (
+                    f"{payment_method.get('metodo_pago', 'Sin registros')} "
+                    f"({payment_method.get('cantidad', 0)} uso/s, "
+                    f"{formatted.get('metodo_pago_total', 'Bs 0.00')})"
+                )
+            }
+        ]
+
+    @staticmethod
+    def get_sales_export_rows(sales_by_day=None):
+        """
+        Devuelve las ventas por día en formato de filas para exportar.
+        """
+        if sales_by_day is None:
+            sales_by_day = ManagerialDashboard.get_sales_by_day_current_month()
+
+        export_rows = []
+
+        for item in sales_by_day:
+            total = item.get('total', 0)
+
+            try:
+                total_formatted = f"Bs {float(total):.2f}"
+            except Exception:
+                total_formatted = 'Bs 0.00'
+
+            export_rows.append({
+                'dia': item.get('day', '-'),
+                'fecha': item.get('date', '-'),
+                'total_vendido': total_formatted
+            })
+
+        return export_rows
+
+    @staticmethod
+    def get_export_data():
+        """
+        Datos completos para exportar el Dashboard Gerencial en PDF, Excel o HTML.
+
+        Este método no altera la lógica del dashboard.
+        Solo organiza los mismos indicadores y ventas diarias para descarga.
+        """
+        dashboard_data = ManagerialDashboard.get_dashboard_data()
+
+        indicators = dashboard_data['indicators']
+        sales_by_day = dashboard_data['sales_by_day']
+
+        return {
+            'title': 'Dashboard Gerencial QuickStore',
+            'generated_at': datetime.now().strftime('%d/%m/%Y %H:%M:%S'),
+            'indicators': indicators,
+            'sales_by_day': sales_by_day,
+            'indicator_rows': ManagerialDashboard.get_indicator_export_rows(indicators),
+            'sales_rows': ManagerialDashboard.get_sales_export_rows(sales_by_day),
+            'has_month_sales': dashboard_data['has_month_sales']
         }
 
     @staticmethod
