@@ -17,6 +17,12 @@ class DatabaseConnection:
     
     def get_connection(self):
         """Obtener conexión a la base de datos"""
+        if not Config.DATABASE_URL:
+            raise ValueError(
+                "DATABASE_URL no está configurada. Asegúrate de configurar la variable de entorno "
+                "DATABASE_URL en tu panel de Railway (ej. DATABASE_URL=${{Postgres.DATABASE_URL}}) "
+                "o de definirla en el archivo .env local."
+            )
         try:
             conn = psycopg2.connect(
                 Config.DATABASE_URL,
