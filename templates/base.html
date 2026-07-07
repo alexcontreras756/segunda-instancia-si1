@@ -711,6 +711,12 @@
         <span class="s-icon"><i class="fas fa-box"></i></span> Productos
     </a>
 
+    {% if session.rol == 'admin' %}
+    <a class="sidebar-link" href="{{ url_for('categorias.listar_categorias') }}">
+        <span class="s-icon"><i class="fas fa-folder"></i></span> Categorías
+    </a>
+    {% endif %}
+
     <a class="sidebar-link" href="{{ url_for('providers.list_providers') }}">
         <span class="s-icon"><i class="fas fa-truck"></i></span> Proveedores
     </a>

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Categorías{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-folder"></i> Gestión de Categorías</h1>
+    <p>Administración de categorías utilizadas para clasificar los productos del sistema MiniMarket QuickStore.</p>
+</div>
+
+<!-- Filtros de búsqueda -->
+<div class="card system-card mb-4">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-filter"></i> Filtros de búsqueda</h5>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="search" class="form-label">Buscar</label>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="search"
+                    name="search"
+                    value="{{ search or '' }}"
+                    placeholder="Buscar por nombre o descripción"
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label for="estado" class="form-label">Estado</label>
+                <select class="form-select" id="estado" name="estado">
+                    <option value="" {% if estado == '' %}selected{% endif %}>Todas</option>
+                    <option value="activo" {% if estado == 'activo' %}selected{% endif %}>Activas</option>
+                    <option value="inactivo" {% if estado == 'inactivo' %}selected{% endif %}>Inactivas</option>
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+                <a href="{{ url_for('categorias.listar_categorias') }}" class="btn btn-secondary flex-fill">
+                    <i class="fas fa-eraser"></i> Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="fas fa-list"></i> Categorías registradas</h4>
+    <a href="{{ url_for('categorias.crear_categoria') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nueva Categoría
+    </a>
+</div>
+
+<div class="card system-card">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-folder-open"></i> Lista de categorías</h5>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width: 80px;">ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Categoría Padre</th>
+                        <th style="width: 120px;">Estado</th>
+                        <th style="width: 120px;" class="text-center">Productos</th>
+                        <th style="width: 220px;" class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categorias %}
+                    <tr>
+                        <td>{{ cat.id }}</td>
+                        <td><strong>{{ cat.nombre }}</strong></td>
+                        <td class="text-muted">{{ cat.descripcion or '-' }}</td>
+                        <td>
+                            {% if cat.padre_nombre %}
+                                <span class="badge bg-info text-dark">{{ cat.padre_nombre }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if cat.estado %}
+                                <span class="badge bg-success">Activa</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactiva</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-dark rounded-pill">{{ cat.total_productos }}</span>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <a href="{{ url_for('categorias.ver_categoria', category_id=cat.id) }}"
+                                   class="btn btn-sm btn-info text-white" title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+
+                                <a href="{{ url_for('categorias.editar_categoria', category_id=cat.id) }}"
+                                   class="btn btn-sm btn-warning" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <form action="{{ url_for('categorias.cambiar_estado', category_id=cat.id) }}" method="POST" style="display:inline;"
+                                      onclick="return confirm('¿Está seguro de que desea {% if cat.estado %}desactivar{% else %}activar{% endif %} esta categoría?')">
+                                    <button type="submit" class="btn btn-sm {% if cat.estado %}btn-secondary{% else %}btn-success{% endif %}" title="{% if cat.estado %}Desactivar{% else %}Activar{% endif %}">
+                                        <i class="fas {% if cat.estado %}fa-ban{% else %}fa-check{% endif %}"></i>
+                                    </button>
+                                </form>
+
+                                <form action="{{ url_for('categorias.eliminar_categoria', category_id=cat.id) }}" method="POST" style="display:inline;"
+                                      onclick="return confirm('¿Está seguro de que desea eliminar permanentemente esta categoría?')">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-folder-open fa-2x mb-2 d-block"></i>
+                            No se encontraron categorías registradas.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

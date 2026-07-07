@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Categoría{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-edit"></i> Editar Categoría</h1>
+    <p>Modificar los datos de la categoría seleccionada.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card system-card">
+            <div class="card-header bg-warning">
+                <h5><i class="fas fa-folder-open"></i> Categoría: {{ categoria.nombre }}</h5>
+            </div>
+
+            <div class="card-body">
+                <form method="POST">
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label" style="color: black;">Nombre de la categoría *</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nombre"
+                            name="nombre"
+                            value="{{ categoria.nombre }}"
+                            required
+                            maxlength="100"
+                        >
+                        <div class="form-text">El nombre es obligatorio y debe ser único.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label" style="color: black;">Descripción</label>
+                        <textarea
+                            class="form-control"
+                            id="descripcion"
+                            name="descripcion"
+                            rows="3"
+                            maxlength="150"
+                        >{{ categoria.descripcion or '' }}</textarea>
+                        <div class="form-text">Máximo 150 caracteres.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_padre" class="form-label" style="color: black;">Categoría Padre</label>
+                        <select class="form-select" id="id_padre" name="id_padre">
+                            <option value="">Ninguna (Categoría principal)</option>
+                            {% for cat in categorias %}
+                                <option value="{{ cat.id }}" {% if categoria.id_padre == cat.id %}selected{% endif %}>
+                                    {{ cat.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Una categoría no puede ser su propia categoría padre.</div>
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            id="estado"
+                            name="estado"
+                            {% if categoria.estado %}checked{% endif %}
+                        >
+                        <label class="form-check-label" for="estado" style="color: black;">
+                            Categoría activa
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save"></i> Actualizar
+                    </button>
+
+                    <a href="{{ url_for('categorias.listar_categorias') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

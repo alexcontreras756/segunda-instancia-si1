@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Categoría{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-plus-circle"></i> Nueva Categoría</h1>
+    <p>Registrar una nueva categoría para la clasificación de productos.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card system-card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-folder"></i> Datos de la categoría</h5>
+            </div>
+
+            <div class="card-body">
+                <form method="POST">
+                    
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label" style="color: black;">Nombre de la categoría *</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nombre"
+                            name="nombre"
+                            required
+                            maxlength="100"
+                            placeholder="Ej: Abarrotes, Limpieza..."
+                        >
+                        <div class="form-text">Máximo 100 caracteres. El nombre es obligatorio y debe ser único.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label" style="color: black;">Descripción</label>
+                        <textarea
+                            class="form-control"
+                            id="descripcion"
+                            name="descripcion"
+                            rows="3"
+                            maxlength="150"
+                            placeholder="Breve descripción de la categoría (opcional)..."
+                        ></textarea>
+                        <div class="form-text">Máximo 150 caracteres.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_padre" class="form-label" style="color: black;">Categoría Padre</label>
+                        <select class="form-select" id="id_padre" name="id_padre">
+                            <option value="">Ninguna (Categoría principal)</option>
+                            {% for cat in categorias %}
+                                <option value="{{ cat.id }}">{{ cat.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text" >Selecciona una categoría si es subcategoría de otra.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar
+                    </button>
+
+                    <a href="{{ url_for('categorias.listar_categorias') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

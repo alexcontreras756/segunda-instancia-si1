@@ -60,6 +60,18 @@
                         >
                     </div>
 
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Categoría *</label>
+                        <select class="form-select" id="category_id" name="category_id" required>
+                            <option value="">Seleccione una categoría</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if product.id_categoria == cat.id %}selected{% endif %}>
+                                    {{ cat.nombre }}{% if not cat.estado %} (Inactiva){% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
                     <div class="mb-3 form-check">
                         <input
                             type="checkbox"

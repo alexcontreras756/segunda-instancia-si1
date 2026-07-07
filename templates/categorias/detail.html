@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Categoría{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1><i class="fas fa-eye"></i> Detalle de Categoría</h1>
+    <p>Consulta la información detallada de la categoría (Solo lectura).</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="card system-card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle"></i> Información de: {{ categoria.nombre }}</h5>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-bordered align-middle">
+                    <tbody>
+                        <tr>
+                            <th class="table-dark" style="width: 200px;">ID</th>
+                            <td>{{ categoria.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="table-dark">Nombre</th>
+                            <td><strong>{{ categoria.nombre }}</strong></td>
+                        </tr>
+                        <tr>
+                            <th class="table-dark">Descripción</th>
+                            <td>{{ categoria.descripcion or 'Sin descripción' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="table-dark">Categoría Padre</th>
+                            <td>
+                                {% if categoria.padre_nombre %}
+                                    <span class="badge bg-info text-dark">{{ categoria.padre_nombre }}</span>
+                                {% else %}
+                                    <span class="text-muted">Ninguna (Categoría principal)</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="table-dark">Estado</th>
+                            <td>
+                                {% if categoria.estado %}
+                                    <span class="badge bg-success">Activa</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactiva</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="table-dark">Productos Asociados</th>
+                            <td>
+                                <span class="badge bg-dark rounded-pill">{{ categoria.total_productos }}</span> productos clasificados
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="mt-4">
+                    <a href="{{ url_for('categorias.editar_categoria', category_id=categoria.id) }}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <a href="{{ url_for('categorias.listar_categorias') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver al listado
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

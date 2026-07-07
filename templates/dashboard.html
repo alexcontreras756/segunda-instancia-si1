@@ -463,6 +463,7 @@
 
 <!-- ─── INVENTARIO Y LOGÍSTICA ─── -->
 {% if permissions_dashboard.can_view_products
+   or permissions_dashboard.can_view_category
    or permissions_dashboard.can_view_providers
    or permissions_dashboard.can_view_warehouses
    or permissions_dashboard.can_view_purchases
@@ -481,6 +482,17 @@
         </div>
         <div class="card-label">Productos</div>
         <div class="card-value">{{ stats.products or 0 }}</div>
+    </a>
+    {% endif %}
+
+    {% if permissions_dashboard.can_view_category %}
+    <a class="stat-card" style="--card-accent:#ec4899" href="{{ url_for('categorias.listar_categorias') }}">
+        <div class="card-icon-row">
+            <div class="card-icon"><i class="fas fa-folder"></i></div>
+            <i class="fas fa-arrow-up-right card-arrow"></i>
+        </div>
+        <div class="card-label">Categorías</div>
+        <div class="card-value">{{ stats.categories or 0 }}</div>
     </a>
     {% endif %}
 

@@ -16,6 +16,7 @@ from models.output_note import OutputNote
 from models.payment_method import PaymentMethod
 from models.discount import Discount
 from models.promotion import Promotion
+from models.categoria import Categoria
 
 from utils.decorators import login_required
 
@@ -39,6 +40,7 @@ from controllers.report_controller import report_bp
 from controllers.voice_ai_controller import voice_ai_bp
 from controllers.managerial_dashboard_controller import managerial_dashboard_bp
 from controllers.abc_classification_controller import abc_classification_bp
+from controllers.categoria_controller import categorias_bp
 
 
 app = Flask(__name__)
@@ -90,6 +92,7 @@ app.register_blueprint(report_bp)
 app.register_blueprint(voice_ai_bp)
 app.register_blueprint(managerial_dashboard_bp)
 app.register_blueprint(abc_classification_bp)
+app.register_blueprint(categorias_bp)
 
 
 # Rutas principales
@@ -131,6 +134,7 @@ def dashboard():
     can_view_payment_methods = Permission.has_permission(codigo_usuario, 'payment_method_read')
     can_view_discounts = Permission.has_permission(codigo_usuario, 'discount_read')
     can_view_promotions = Permission.has_permission(codigo_usuario, 'promotion_read')
+    can_view_category = Permission.has_permission(codigo_usuario, 'category_read')
 
     # Reportes
     can_view_sales_report = Permission.has_permission(codigo_usuario, 'report_sales_read')
@@ -211,6 +215,9 @@ def dashboard():
         stats['promotions'] = Promotion.count_all()
         stats['active_promotions'] = Promotion.count_active_valid()
 
+    if can_view_category:
+        stats['categories'] = len(Categoria.get_all())
+
     if can_view_reports:
         reports_count = 0
 
@@ -245,6 +252,7 @@ def dashboard():
         'can_view_payment_methods': can_view_payment_methods,
         'can_view_discounts': can_view_discounts,
         'can_view_promotions': can_view_promotions,
+        'can_view_category': can_view_category,
 
         # Reportes
         'can_view_reports': can_view_reports,
