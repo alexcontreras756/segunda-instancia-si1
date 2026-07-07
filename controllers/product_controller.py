@@ -52,7 +52,7 @@ def create_product():
         else:
             flash('Error al crear el producto', 'danger')
 
-    return render_template('products/create.html', categories=categories)
+    return render_template('products/create.html')
 
 
 @product_bp.route('/edit/<int:product_id>', methods=['GET', 'POST'])
@@ -105,7 +105,7 @@ def edit_product(product_id):
         else:
             flash('Error al actualizar el producto', 'danger')
 
-    return render_template('products/edit.html', product=product, categories=categories)
+    return render_template('products/edit.html', product=product)
 
 
 @product_bp.route('/delete/<int:product_id>')
