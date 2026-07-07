@@ -31,6 +31,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
+                        <th>Categoría</th>
                         <th>Precio Venta</th>
                         <th>Stock Mínimo</th>
                         <th>Estado</th>
@@ -45,6 +46,14 @@
 
                         <td>
                             <strong>{{ product.nombre }}</strong>
+                        </td>
+
+                        <td>
+                            {% if product.categoria_nombre %}
+                                <span class="badge bg-info text-dark">{{ product.categoria_nombre }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
                         </td>
 
                         <td>
@@ -79,7 +88,7 @@
 
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center text-muted">
+                        <td colspan="7" class="text-center text-muted">
                             No hay productos registrados.
                         </td>
                     </tr>
