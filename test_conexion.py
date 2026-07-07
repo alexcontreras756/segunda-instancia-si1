@@ -1,25 +1,19 @@
-from config import Config
 import psycopg2
+from config import Config
 
-print(f"Conectando a base de datos: {Config.DB_NAME}")
+print("Probando conexión a la base de datos usando DATABASE_URL...")
 
 try:
-    conn = psycopg2.connect(
-        host=Config.DB_HOST,
-        port=Config.DB_PORT,
-        database=Config.DB_NAME,
-        user=Config.DB_USER,
-        password=Config.DB_PASSWORD
-    )
-    print("✅ Conexión exitosa a MiniMarketOF")
+    conn = psycopg2.connect(Config.DATABASE_URL)
+    print("SUCCESS: Conexion exitosa a la base de datos")
     
     cursor = conn.cursor()
-    cursor.execute("SELECT current_database();")
+    cursor.execute("SELECT 1;")
     resultado = cursor.fetchone()
-    print(f"Conectado a: {resultado[0]}")
+    print(f"Resultado de ejecutar SELECT 1: {resultado[0]}")
     
     cursor.close()
     conn.close()
     
 except Exception as e:
-    print(f"❌ Error: {e}")
+    print(f"ERROR al conectar: {e}")

@@ -7,15 +7,13 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     
     # Database configuration
-    DB_HOST = os.getenv('DB_HOST', 'localhost')
-    DB_PORT = os.getenv('DB_PORT', '5432')
-    DB_NAME = os.getenv('DB_NAME', 'RAILWAY')
-
-    DB_USER = os.getenv('DB_USER', 'postgres')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', 'yUSSrBtdBNxdGGDecVtgPqXguNcYdeQz')
-
-    
-    DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    if not DATABASE_URL:
+        raise ValueError(
+            "DATABASE_URL no está configurada. Asegúrate de configurar la variable de entorno "
+            "DATABASE_URL en tu panel de Railway (ej. DATABASE_URL=${{Postgres.DATABASE_URL}}) "
+            "o de definirla en el archivo .env local."
+        )
     
     # Session configuration
     SESSION_TYPE = 'filesystem'

@@ -19,11 +19,7 @@ class DatabaseConnection:
         """Obtener conexión a la base de datos"""
         try:
             conn = psycopg2.connect(
-                host=Config.DB_HOST,
-                port=Config.DB_PORT,
-                database=Config.DB_NAME,
-                user=Config.DB_USER,
-                password=Config.DB_PASSWORD,
+                Config.DATABASE_URL,
                 cursor_factory=RealDictCursor
             )
             return conn
